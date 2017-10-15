@@ -1,11 +1,13 @@
 module Main exposing (main)
 
-import Html exposing (table, tr, th, td, text, beginnerProgram, Html)
+import Html exposing (table, tr, th, td, text, program, Html)
 import Dict exposing (Dict)
+import Http
+import Json.Decode as Decode exposing (Decoder, decodeString, list, string, field, map)
 
 
 main =
-    beginnerProgram { model = init, update = update, view = view }
+    program { init = init, update = update, view = view, subscriptions = \_ -> Sub.none }
 
 
 type alias Item = String
@@ -26,25 +28,47 @@ type alias Model =
     List User
 
 
-init : List User
+init : (Model, Cmd Msg)
 init =
-    [ User "Anna" [ Rating "Greta Gris" 5, Rating "Bon" 3 ]
+    ([ User "Anna" [ Rating "Greta Gris" 5, Rating "Bon" 3 ]
     , User "Britta" [ Rating "Bon" 2, Rating "Nobelfesten" 5 ]
     , User "Cilla" [ Rating "Vår tid är nu" 1, Rating "Medan vi dör" 5 ]
     , User "Daniela" [ Rating "Skam" 3, Rating "Vår tid är nu" 3 ]
-    ]
+    ], fetchNextState)
 
 
 type Msg
     = Next
+    | NewState (Result Http.Error Model)
 
-
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Next ->
-            model
+            (model, fetchNextState)
+        NewState (Ok newModel) ->
+            (newModel, Cmd.none)
+        NewState (Err msg) ->
+            (model, Cmd.none)
 
+
+fetchNextState : Cmd Msg
+fetchNextState =
+    Http.get "/userdata" decodeModel
+        |> Http.send NewState
+
+decodeModel: Decoder Model
+decodeModel =
+    list user
+
+user : Decoder User
+user =
+    map userOneArgument (field "name" string)
+
+
+userOneArgument : String -> User
+userOneArgument name =
+    User name [ Rating "Vår tid är nu" 5 ]
 
 view : Model -> Html Msg
 view model =
