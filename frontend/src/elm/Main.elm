@@ -2,8 +2,9 @@ module Main exposing (main)
 
 import Html exposing (table, tr, th, td, text, program, Html)
 import Dict exposing (Dict)
+import Set exposing (Set)
 import Http
-import Json.Decode as Decode exposing (Decoder, decodeString, list, string, field, map)
+import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map2)
 
 
 main =
@@ -63,20 +64,30 @@ decodeModel =
 
 user : Decoder User
 user =
-    map userOneArgument (field "name" string)
+    map2 User (field "name" string) (field "ratings" (list decodeRating))
 
 
-userOneArgument : String -> User
-userOneArgument name =
-    User name [ Rating "Vår tid är nu" 5 ]
+decodeRating : Decoder Rating
+decodeRating =
+    map2 Rating (at ["video", "name"] string) (at ["score", "score"] float)
 
 view : Model -> Html Msg
 view model =
     let
-        items = [ "Greta Gris", "Bon", "Nobelfesten", "Vår tid är nu", "Medan vi dör", "Skam" ]
+        items = extractItems model
     in
         table []
             (heading items :: List.map (row items) model)
+
+extractItems : List User -> List String
+extractItems users =
+    List.concatMap extractUserItems users
+        |> Set.fromList
+        |> Set.toList
+
+extractUserItems : User -> List String
+extractUserItems user =
+    List.map (\rating -> rating.item) user.ratings
 
 heading : List Item -> Html Msg
 heading items =
@@ -90,7 +101,7 @@ row items user =
 
 ratings : List Item -> List Rating -> List (Html Msg)
 ratings items ratings =
-    List.map (rating ratings) items
+   List.map (rating ratings) items
 
 rating : List Rating -> Item -> Html Msg
 rating ratings item =
