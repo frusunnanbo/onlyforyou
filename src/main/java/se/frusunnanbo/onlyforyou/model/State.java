@@ -8,5 +8,5 @@ import java.util.Collection;
 public class State {
 
     double loss;
-    Collection<Collection<Double>>[][] ratings;
+    Collection<Collection<Double>> ratings;
 }
