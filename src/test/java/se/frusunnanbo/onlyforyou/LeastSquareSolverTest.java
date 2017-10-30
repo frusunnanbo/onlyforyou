@@ -82,6 +82,28 @@ public class LeastSquareSolverTest {
         assertThat(solution).has(elements(1.0, 4.0, 2.0, 5.0, 3.0, 6.0));
     }
 
+    @Test
+    public void using_regularisation_factor() {
+        final SimpleMatrix ratings = new SimpleMatrix(new double[][]{
+                {9, 1, 29},
+                {2, 26, 40},
+                {15, 33, 3}});
+        final SimpleMatrix itemFeatures = new SimpleMatrix(new double[][]{
+                {1, 2},
+                {3, 4},
+                {5, 6},
+        });
+        final SimpleMatrix knowns = new SimpleMatrix(new double[][]{
+                {1, 0, 1},
+                {0, 1, 1},
+                {1, 1, 0}
+        });
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, knowns, 0.01).solve(itemFeatures);
+        assertThat(solution).has(numberOfRows(3));
+        assertThat(solution).has(numberOfColumns(2));
+        assertThat(solution).has(elementsCloseButNotEqualTo(1.0, 4.0, 2.0, 5.0, 3.0, 6.0));
+    }
+
 
     private static SimpleMatrix fullConfidence(int dimension) {
         return SimpleMatrix.random(dimension, dimension, 1.0, 1.0, new Random());
@@ -100,23 +122,25 @@ public class LeastSquareSolverTest {
         return new SimpleMatrix(new double[][]{{e1, e2}, {e3, e4}});
     }
 
-    private SimpleMatrix threeByThreeMatrix(double e1, double e2, double e3, double e4, double e5, double e6, double e7, double e8, double e9) {
-        return new SimpleMatrix(new double[][]{{e1, e2, e3}, {e4, e5, e6}, {e7, e8, e9}});
-    }
-
     private static SimpleMatrix oneElementMatrix(double value) {
         return new SimpleMatrix(new double[][]{{value}});
     }
 
     private Condition<SimpleMatrix> elements(double... expected) {
         final Collection<Double> boxed = DoubleStream.of(expected).boxed().collect(toList());
-        return new Condition<>(matrix -> roughlyEquals(matrix, expected), "elements %s", boxed);
+        return new Condition<>(matrix -> roughlyEquals(matrix, expected, 0.001), "elements %s", boxed);
     }
 
-    private boolean roughlyEquals(SimpleMatrix matrix, double[] expected) {
+    private Condition<SimpleMatrix> elementsCloseButNotEqualTo(double... expected) {
+        final Collection<Double> boxed = DoubleStream.of(expected).boxed().collect(toList());
+        return new Condition<>(matrix -> !roughlyEquals(matrix, expected, 0.001)
+                && roughlyEquals(matrix, expected, 0.5), "elements close but not equal to %s", boxed);
+    }
+
+    private boolean roughlyEquals(SimpleMatrix matrix, double[] expected, double allowedError) {
         final double[] actual = matrix.getMatrix().getData();
         for (int i = 0; i < actual.length; i++) {
-            if (Math.abs(actual[i] - expected[i]) > 0.001) {
+            if (Math.abs(actual[i] - expected[i]) > allowedError) {
                 return false;
             }
         }
