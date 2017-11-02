@@ -23,7 +23,7 @@ public class LeastSquareSolver {
         return result;
     }
 
-    public SimpleMatrix solveRow(SimpleMatrix regressors, int row) {
+    private SimpleMatrix solveRow(SimpleMatrix regressors, int row) {
         SimpleMatrix rowConfidence = SimpleMatrix.diag(confidence.extractVector(true, row).getMatrix().getData());
         SimpleMatrix rowResponses = responses.extractVector(true, row);
         return (regressors.transpose().mult(rowConfidence).mult(regressors).plus(lambda, SimpleMatrix.identity(regressors.numCols()))).invert()

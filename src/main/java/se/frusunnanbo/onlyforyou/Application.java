@@ -12,7 +12,7 @@ import static spark.Spark.staticFiles;
 public class Application {
     public static void main(String[] args) {
         Gson gson = new Gson();
-        Calculation current = Calculation.initial(UserData.ratings(UserData.users()));
+        Calculation current = Calculation.create(UserData.ratings(UserData.users()));
 
         Spark.externalStaticFileLocation(System.getProperty("frontend.root"));
         staticFiles.registerMimeType("html", "text/html; charset=utf-8");

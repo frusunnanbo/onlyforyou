@@ -4,33 +4,33 @@ import se.frusunnanbo.onlyforyou.ComputationConstants;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.stream.Collectors.toList;
 
 public class Calculation {
 
-    private final Collection<Collection<Optional<Double>>> ratings;
-    private final Collection<Collection<Double>> estimations;
+    private final static int NUMBER_OF_FEATURES = 10;
+    private final RatingsMatrix ratings;
+    private final AtomicReference<OptimizationIteration> state;
 
-    private Calculation(Collection<Collection<Optional<Double>>> ratings, Collection<Collection<Double>> estimations) {
+    private Calculation(RatingsMatrix ratings) {
+
         this.ratings = ratings;
-        this.estimations = estimations;
+        this.state = new AtomicReference<>(OptimizationIteration.initial(NUMBER_OF_FEATURES, ratings));
     }
 
-    public static Calculation initial(Collection<Collection<Optional<Double>>> ratings) {
-        long numberOfUsers = ratings.size();
-        long numberOfItems = ratings.stream().flatMap(Collection::stream).count() / numberOfUsers;
-        return new Calculation(copyOf(ratings), randomEstimations(numberOfUsers, numberOfItems));
+    public static Calculation create(Collection<Collection<Optional<Double>>> ratings) {
+        return null;
     }
 
-    public Collection<Collection<Double>> estimations() {
-        return estimations;
+    public double[][] estimations() {
+        return state.get().estimations();
     }
 
     public double loss() {
-        return LossFunctions.mseLoss(ratings, estimations) + LossFunctions.regularizationTerm();
+        return ratings.loss(state.get().estimations()) + LossFunctions.regularizationTerm();
     }
 
     private static Collection<Collection<Double>> randomEstimations(long numberOfUsers, long numberOfItems) {
@@ -42,12 +42,12 @@ public class Calculation {
     }
 
     public Calculation next() {
-        return new Calculation(copyOf(ratings), iterate(estimations));
+        state.getAndUpdate(oldState -> oldState.next());
+        return this;
     }
 
     private Collection<Collection<Double>> iterate(Collection<Collection<Double>> estimations) {
         return randomEstimations(ComputationConstants.NUMBER_OF_USERS, ComputationConstants.NUMBER_OF_ITEMS);
     }
-
 
 }
