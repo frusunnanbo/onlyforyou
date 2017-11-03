@@ -3,7 +3,6 @@ package se.frusunnanbo.onlyforyou.current;
 import se.frusunnanbo.onlyforyou.ComputationConstants;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -21,8 +20,8 @@ public class Calculation {
         this.state = new AtomicReference<>(OptimizationIteration.initial(NUMBER_OF_FEATURES, ratings));
     }
 
-    public static Calculation create(Collection<Collection<Optional<Double>>> ratings) {
-        return null;
+    public static Calculation create(RatingsMatrix ratings) {
+        return new Calculation(ratings);
     }
 
     public double[][] estimations() {
@@ -42,7 +41,7 @@ public class Calculation {
     }
 
     public Calculation next() {
-        state.getAndUpdate(oldState -> oldState.next());
+        state.getAndUpdate(OptimizationIteration::next);
         return this;
     }
 

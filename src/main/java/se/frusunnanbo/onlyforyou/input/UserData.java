@@ -1,15 +1,19 @@
 package se.frusunnanbo.onlyforyou.input;
 
+import se.frusunnanbo.onlyforyou.current.RatingsMatrix;
 import se.frusunnanbo.onlyforyou.model.Rating;
 import se.frusunnanbo.onlyforyou.model.User;
 import se.frusunnanbo.onlyforyou.model.Video;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
+import static se.frusunnanbo.onlyforyou.current.RatingsMatrix.Element.element;
 import static se.frusunnanbo.onlyforyou.model.Rating.rating;
 import static se.frusunnanbo.onlyforyou.model.User.user;
 
@@ -25,6 +29,27 @@ public class UserData {
                 user("Barn Barnsson", rating("Bon", 5), rating("Greta gris", 5))
         );
     }
+
+    public static RatingsMatrix ratingsMatrix(Collection<User> users) {
+        List<Video> videos = users.stream()
+                .flatMap(user -> user.getRatings().stream().map(Rating::getVideo))
+                .distinct()
+                .collect(toList());
+
+        final List<User> userList = new ArrayList<>(users);
+        final List<RatingsMatrix.Element> elements = IntStream.range(0, users.size())
+                .mapToObj(i -> userList.get(i).getRatings().stream()
+                        .map(rating -> element(i, getColumnNumber(rating, videos), rating.getScore().getScore())))
+                .flatMap(s -> s)
+                .collect(toList());
+
+        return RatingsMatrix.of(users.size(), videos.size(), elements);
+    }
+
+    private static int getColumnNumber(Rating rating, List<Video> videos) {
+        return videos.indexOf(rating.getVideo());
+    }
+
 
     public static Collection<Collection<Optional<Double>>> ratings(Collection<User> users) {
         List<Video> videos = users.stream()
