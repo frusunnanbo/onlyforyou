@@ -20,7 +20,7 @@ public class Application {
 
         get("/userdata", (req, res) -> UserData.users(), gson::toJson);
         get("/currentstate", (req, res) -> new State(current.loss(), current.estimations()), gson::toJson);
-        post("/currentstate", (req, res) -> {
+        post("/currentstate/next", (req, res) -> {
             current.next();
             return new State(current.loss(), current.estimations());
         }, gson::toJson);
