@@ -26,7 +26,7 @@ public class UserData {
                 user("Carin", rating("Mitt i naturen", 4), rating("Cityakuten", 5)),
                 user("Dilba", rating("Skilda världar", 5)),
                 user("Eva", rating("Greta Gris", 5), rating("Sweeney Todd", 5), rating("Cityakuten", 5)),
-                user("Frida", rating("Stranger things", 2), rating("Väder", 1)),
+                user("Frida", rating("Scream", 2), rating("Väder", 1)),
                 user("Gun", rating("Mitt i naturen", 3), rating("Fotbolls-VM", 3), rating("Äntligen hemma", 5))
         );
     }

@@ -47,20 +47,33 @@ type alias Model =
 
 initialUsers : List User
 initialUsers =
-    [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva" ]
+    [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva", User "Frida", User "Gun" ]
 
 
 initialItems : List Item
 initialItems =
-    [ Item "Greta Gris", Item "Hela Sverige Bakar" ]
+    [ Item "Gift vid första ögonkastet"
+    , Item "Mitt i naturen"
+    , Item "Hela Sverige bakar"
+    , Item "Skilda världar"
+    , Item "Fottbols-VM"
+    , Item "Scream"
+    , Item "Väder"
+    , Item "Greta Gris"
+    , Item "Sweeney Todd"
+    , Item "Cityakuten"
+    , Item "Äntligen hemma"
+    ]
 
 initialRatings : List (List Float)
 initialRatings =
-    [ [ 0.3, 0.5 ]
-    , [ 3.4, 1.5 ]
-    , [ 5.0, 3.3 ]
-    , [ 4.4, 1.2 ]
-    , [ 2.4, 2.5 ]
+    [ [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
+    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
     ]
 
 
