@@ -21,12 +21,13 @@ public class UserData {
 
     public static Collection<User> users() {
         return Arrays.asList(
-                user("Per Persson", rating("Greta gris", 5), rating("Den goda viljan", 3)),
-                user("Sofie Svensson", rating("Skam", 4), rating("Bonusfamiljen", 2)),
-                user("Anders Andersson", rating("Bonusfamiljen", 2), rating("Året med kungafamiljen", 5)),
-                user("Maja Karlsson", rating("Året med kungafamiljen", 5), rating("Den goda viljan", 3)),
-                user("Pia Fåk Sunnanbo", rating("Bon", 5), rating("Bonusfamiljen", 4)),
-                user("Barn Barnsson", rating("Bon", 5), rating("Greta gris", 5))
+                user("Anna", rating("Hela Sverige bakar", 3), rating("Greta Gris", 5)),
+                user("Britta", rating("Gift vid första ögonkastet", 2), rating("Fotbolls-VM", 1)),
+                user("Carin", rating("Mitt i naturen", 4), rating("Cityakuten", 5)),
+                user("Dilba", rating("Skilda världar", 5)),
+                user("Eva", rating("Greta Gris", 5), rating("Sweeney Todd", 5), rating("Cityakuten", 5)),
+                user("Frida", rating("Stranger things", 2), rating("Väder", 1)),
+                user("Gun", rating("Mitt i naturen", 3), rating("Fotbolls-VM", 3), rating("Äntligen hemma", 5))
         );
     }
 
