@@ -2,12 +2,13 @@ package se.frusunnanbo.onlyforyou.model;
 
 import lombok.Value;
 
-import java.util.List;
+import java.util.Collection;
 
 @Value
 public class State {
 
-    List<Video> items;
+    Collection<User> users;
+    Collection<Video> items;
     double loss;
     double[][] ratings;
 }

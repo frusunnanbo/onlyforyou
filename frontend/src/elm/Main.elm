@@ -5,7 +5,7 @@ import Html.Attributes exposing (class)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Http
-import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2)
+import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2, map3)
 import FormatNumber
 import FormatNumber.Locales exposing (usLocale)
 
@@ -47,42 +47,9 @@ type alias Model =
     , optimizationState : OptimizationState
     }
 
-
-initialUsers : List User
-initialUsers =
-    [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva", User "Frida", User "Gun" ]
-
-
-initialItems : List Item
-initialItems =
-    [ Item "Gift vid första ögonkastet"
-    , Item "Mitt i naturen"
-    , Item "Hela Sverige bakar"
-    , Item "Skilda världar"
-    , Item "Fottbols-VM"
-    , Item "Scream"
-    , Item "Väder"
-    , Item "Greta Gris"
-    , Item "Sweeney Todd"
-    , Item "Cityakuten"
-    , Item "Äntligen hemma"
-    ]
-
-initialRatings : List (List Float)
-initialRatings =
-    [ [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    , [ 0.3, 0.5, 0, 0, 0, 0.3, 0.5, 0, 0, 0, 4.5 ]
-    ]
-
-
 initialOptimizationState : OptimizationState
 initialOptimizationState =
-    { users = initialUsers, items = initialItems, ratings = initialRatings }
+    { users = [], items = [], ratings = [] }
 
 
 init : ( Model, Cmd Msg )
@@ -135,29 +102,28 @@ fetchInitialUserData =
 
 decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
-    map2 optimizationState (field "items" (list (field "name" string))) (field "ratings" (list (list float)))
+    map3 OptimizationState (field "users" (list user)) (field "items" (list item)) (field "ratings" (list (list float)))
 
-optimizationState : List String -> List (List Float) -> OptimizationState
-optimizationState itemNames ratings =
-    OptimizationState initialUsers (List.map (\name -> Item name) itemNames) ratings
+user : Decoder User
+user = map User (field "name" string)
 
 decodeUserData : Decoder (List UserRatings)
 decodeUserData =
-    list user
+    list userRatings
 
-user : Decoder UserRatings
-user =
+userRatings : Decoder UserRatings
+userRatings =
     map2 UserRatings (field "name" string) (field "ratings" (list decodeRating))
 
 
 decodeRating : Decoder Rating
 decodeRating =
-    map2 Rating item (at [ "score", "score" ] float)
+    map2 Rating (field "video" item) (at [ "score", "score" ] float)
 
 
 item : Decoder Item
 item =
-    map Item (at [ "video", "name" ] string)
+    map Item (field "name" string)
 
 
 view : Model -> Html Msg
