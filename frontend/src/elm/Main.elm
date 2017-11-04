@@ -54,10 +54,19 @@ initialItems : List Item
 initialItems =
     [ Item "Greta Gris", Item "Hela Sverige Bakar" ]
 
+initialRatings : List (List Float)
+initialRatings =
+    [ [ 0.3, 0.5 ]
+    , [ 3.4, 1.5 ]
+    , [ 5.0, 3.3 ]
+    , [ 4.4, 1.2 ]
+    , [ 2.4, 2.5 ]
+    ]
+
 
 initialOptimizationState : OptimizationState
 initialOptimizationState =
-    { users = initialUsers, items = initialItems, ratings = [] }
+    { users = initialUsers, items = initialItems, ratings = initialRatings }
 
 
 init : ( Model, Cmd Msg )
@@ -129,7 +138,7 @@ optimizationView : OptimizationState -> Html Msg
 optimizationView optimizationState =
     table []
           (itemsHeading optimizationState.items
-          :: ratingsRow optimizationState.users optimizationState.ratings)
+          :: ratingsRows optimizationState.users optimizationState.ratings)
 
 itemsHeading : List Item -> Html Msg
 itemsHeading items =
@@ -137,9 +146,13 @@ itemsHeading items =
     (th [] []
     :: List.map (\item -> th [] [ text item.name ]) items)
 
-ratingsRow : List User -> List (List Float) -> List (Html Msg)
-ratingsRow users ratings =
-    List.map (\user -> tr [] [ td [] [ text user.name ]]) users
+ratingsRows : List User -> List (List Float) -> List (Html Msg)
+ratingsRows users ratings =
+    List.map2 ratingsRow users ratings
+
+ratingsRow : User -> List Float -> Html Msg
+ratingsRow user ratings =
+    tr [] [ td [] [ text user.name ]]
 
 extractItems : List UserRatings -> List String
 extractItems users =
