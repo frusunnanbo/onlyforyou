@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Html exposing (table, tr, th, td, div, text, program, Html)
+import Html exposing (table, tr, th, td, div, button, text, program, Html)
 import Html.Attributes exposing (class)
 import Dict exposing (Dict)
 import Set exposing (Set)
@@ -47,6 +47,7 @@ type alias Model =
     , optimizationState : OptimizationState
     }
 
+
 initialOptimizationState : OptimizationState
 initialOptimizationState =
     { users = [], items = [], ratings = [] }
@@ -77,39 +78,46 @@ update msg model =
         CurrentState (Err msg) ->
             ( model, Cmd.none )
 
+
 withNewRatings : OptimizationState -> List (List Float) -> OptimizationState
 withNewRatings state ratings =
     { state | ratings = ratings }
 
+
 fetchInitialState : Cmd Msg
 fetchInitialState =
-    Cmd.batch [
-        fetchInitialUserData,
-        fetchCurrentOptimizationState
-    ]
+    Cmd.batch
+        [ fetchInitialUserData
+        , fetchCurrentOptimizationState
+        ]
 
 
 fetchCurrentOptimizationState : Cmd Msg
 fetchCurrentOptimizationState =
-     Http.get "/currentstate" decodeCurrentState
-            |> Http.send CurrentState
+    Http.get "/currentstate" decodeCurrentState
+        |> Http.send CurrentState
 
 
 fetchInitialUserData : Cmd Msg
 fetchInitialUserData =
-     Http.get "/userdata" decodeUserData
-            |> Http.send InitialData
+    Http.get "/userdata" decodeUserData
+        |> Http.send InitialData
+
 
 decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
     map3 OptimizationState (field "users" (list user)) (field "items" (list item)) (field "ratings" (list (list float)))
 
+
 user : Decoder User
-user = map User (field "name" string)
+user =
+    map User (field "name" string)
+
 
 decodeUserData : Decoder (List UserRatings)
 decodeUserData =
     list userRatings
+
 
 userRatings : Decoder UserRatings
 userRatings =
@@ -144,29 +152,46 @@ view model =
 
 optimizationView : OptimizationState -> Html Msg
 optimizationView optimizationState =
-    table []
-          (itemsHeading optimizationState.items
-          :: ratingsRows optimizationState.users optimizationState.ratings)
+    div [ class "optimizationView" ]
+        [ table []
+            (itemsHeading optimizationState.items
+                :: ratingsRows optimizationState.users optimizationState.ratings
+            )
+        , nextButton
+        ]
+
+
+nextButton : Html Msg
+nextButton =
+    div [ class "nextbutton" ]
+        [ button [] [ text "Next" ] ]
+
 
 itemsHeading : List Item -> Html Msg
 itemsHeading items =
     tr []
-    (th [] []
-    :: List.map (\item -> th [] [ text item.name ]) items)
+        (th [] []
+            :: List.map (\item -> th [] [ text item.name ]) items
+        )
+
 
 ratingsRows : List User -> List (List Float) -> List (Html Msg)
 ratingsRows users ratings =
     List.map2 ratingsRow users ratings
 
+
 ratingsRow : User -> List Float -> Html Msg
 ratingsRow user ratings =
     tr []
-    ( td [] [ text user.name ]
-    :: List.map (\rating -> td [ class "rating" ] [ text (formatRating rating) ]) ratings)
+        (td [] [ text user.name ]
+            :: List.map (\rating -> td [ class "rating" ] [ text (formatRating rating) ]) ratings
+        )
+
 
 formatRating : Float -> String
 formatRating rating =
     FormatNumber.format usLocale rating
+
 
 extractItems : List UserRatings -> List String
 extractItems users =

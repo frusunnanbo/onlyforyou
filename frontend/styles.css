@@ -26,3 +26,18 @@ td:first-child, th:first-child {
 td.rating {
     text-align: center;
 }
+
+div.optimizationView {
+    display: flex;
+    align-items: flex-end;
+}
+
+div.nextbutton button {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #7CD12A;
+    color: white;
+    border: none;
+    border-radius: 0.2rem;
+    margin-bottom: 2vw;
+}
