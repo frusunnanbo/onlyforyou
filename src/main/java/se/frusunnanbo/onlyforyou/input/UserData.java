@@ -24,7 +24,7 @@ public class UserData {
                 user("Anna", rating("Hela Sverige bakar", 3), rating("Greta Gris", 5)),
                 user("Britta", rating("Gift vid första ögonkastet", 2), rating("Fotbolls-VM", 1)),
                 user("Carin", rating("Mitt i naturen", 4), rating("Cityakuten", 5)),
-                user("Dilba", rating("Skilda världar", 5)),
+                user("Dilba", rating("Skilda världar", 3)),
                 user("Eva", rating("Greta Gris", 5), rating("Sweeney Todd", 5), rating("Cityakuten", 5)),
                 user("Frida", rating("Scream", 2), rating("Väder", 1)),
                 user("Gun", rating("Mitt i naturen", 3), rating("Fotbolls-VM", 3), rating("Äntligen hemma", 5))
@@ -32,10 +32,7 @@ public class UserData {
     }
 
     public static RatingsMatrix ratingsMatrix(Collection<User> users) {
-        List<Video> videos = users.stream()
-                .flatMap(user -> user.getRatings().stream().map(Rating::getVideo))
-                .distinct()
-                .collect(toList());
+        List<Video> videos = items(users);
 
         final List<User> userList = new ArrayList<>(users);
         final List<RatingsMatrix.Element> elements = IntStream.range(0, users.size())
@@ -47,16 +44,20 @@ public class UserData {
         return RatingsMatrix.of(users.size(), videos.size(), elements);
     }
 
+    public static List<Video> items(Collection<User> users) {
+        return users.stream()
+                .flatMap(user -> user.getRatings().stream().map(Rating::getVideo))
+                .distinct()
+                .collect(toList());
+    }
+
     private static int getColumnNumber(Rating rating, List<Video> videos) {
         return videos.indexOf(rating.getVideo());
     }
 
 
     public static Collection<Collection<Optional<Double>>> ratings(Collection<User> users) {
-        List<Video> videos = users.stream()
-                .flatMap(user -> user.getRatings().stream().map(Rating::getVideo))
-                .distinct()
-                .collect(toList());
+        List<Video> videos = items(users);
 
         return users.stream()
                 .filter(user -> !user.getRatings().isEmpty())

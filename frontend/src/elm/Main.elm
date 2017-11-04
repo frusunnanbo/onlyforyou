@@ -89,7 +89,7 @@ init =
 
 type Msg
     = InitialData (Result Http.Error (List UserRatings))
-    | CurrentState (Result Http.Error (List (List Float)))
+    | CurrentState (Result Http.Error OptimizationState)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,8 +101,8 @@ update msg model =
         InitialData (Err msg) ->
             ( model, Cmd.none )
 
-        CurrentState (Ok currentRatings) ->
-            ( { model | optimizationState = withNewRatings model.optimizationState currentRatings }, Cmd.none )
+        CurrentState (Ok optimizationState) ->
+            ( { model | optimizationState = optimizationState }, Cmd.none )
 
         CurrentState (Err msg) ->
             ( model, Cmd.none )
@@ -130,9 +130,13 @@ fetchInitialUserData =
      Http.get "/userdata" decodeUserData
             |> Http.send InitialData
 
-decodeCurrentState : Decoder (List (List Float))
+decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
-    (field "ratings" (list (list float)))
+    map2 optimizationState (field "items" (list (field "name" string))) (field "ratings" (list (list float)))
+
+optimizationState : List String -> List (List Float) -> OptimizationState
+optimizationState itemNames ratings =
+    OptimizationState initialUsers (List.map (\name -> Item name) itemNames) ratings
 
 decodeUserData : Decoder (List UserRatings)
 decodeUserData =
