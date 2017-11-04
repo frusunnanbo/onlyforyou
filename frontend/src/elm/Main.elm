@@ -19,52 +19,63 @@ type alias Rating =
     }
 
 
-type alias User =
+type alias UserRatings =
     { name : String
     , ratings : List Rating
     }
 
+type alias User =
+    { name: String }
+
+type alias OptimizationState =
+    { users: List User
+    , items: List Item
+    , ratings: List (List Float)
+    }
 
 type alias Model =
-    List User
+    { actualRatings: List UserRatings
+    , optimizationState: OptimizationState
+    }
 
+initialOptimizationState : OptimizationState
+initialOptimizationState = { users = [], items = [], ratings = [] }
 
 init : (Model, Cmd Msg)
 init =
-    ([ User "Anna" [ Rating "Greta Gris" 5, Rating "Bon" 3 ]
-    , User "Britta" [ Rating "Bon" 2, Rating "Nobelfesten" 5 ]
-    , User "Cilla" [ Rating "Vår tid är nu" 1, Rating "Medan vi dör" 5 ]
-    , User "Daniela" [ Rating "Skam" 3, Rating "Vår tid är nu" 3 ]
-    ], fetchNextState)
+    ({
+    actualRatings = []
+    , optimizationState = initialOptimizationState
+    }, fetchNextState)
 
 
 type Msg
     = Next
-    | NewState (Result Http.Error Model)
+    | NewState (Result Http.Error (List UserRatings))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Next ->
             (model, fetchNextState)
-        NewState (Ok newModel) ->
-            (newModel, Cmd.none)
+        NewState (Ok newUserData) ->
+            ({ model | actualRatings = newUserData}, Cmd.none)
         NewState (Err msg) ->
             (model, Cmd.none)
 
 
 fetchNextState : Cmd Msg
 fetchNextState =
-    Http.get "/userdata" decodeModel
+    Http.get "/userdata" decodeUserData
         |> Http.send NewState
 
-decodeModel: Decoder Model
-decodeModel =
+decodeUserData: Decoder (List UserRatings)
+decodeUserData =
     list user
 
-user : Decoder User
+user : Decoder UserRatings
 user =
-    map2 User (field "name" string) (field "ratings" (list decodeRating))
+    map2 UserRatings (field "name" string) (field "ratings" (list decodeRating))
 
 
 decodeRating : Decoder Rating
@@ -74,18 +85,19 @@ decodeRating =
 view : Model -> Html Msg
 view model =
     let
-        items = extractItems model
+        userRatings = model.actualRatings
+        items = extractItems userRatings
     in
         table []
-            (heading items :: List.map (row items) model)
+            (heading items :: List.map (row items) userRatings)
 
-extractItems : List User -> List String
+extractItems : List UserRatings -> List String
 extractItems users =
     List.concatMap extractUserItems users
         |> Set.fromList
         |> Set.toList
 
-extractUserItems : User -> List String
+extractUserItems : UserRatings -> List String
 extractUserItems user =
     List.map (\rating -> rating.item) user.ratings
 
@@ -94,7 +106,7 @@ heading items =
     tr []
         (th [] [text ""] :: List.map (\item ->  th [] [ text item ]) items)
 
-row : List Item -> User -> Html Msg
+row : List Item -> UserRatings -> Html Msg
 row items user =
     tr []
         (td [] [ text user.name ] :: (ratings items) user.ratings)
