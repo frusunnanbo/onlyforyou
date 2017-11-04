@@ -1,10 +1,13 @@
 module Main exposing (main)
 
 import Html exposing (table, tr, th, td, div, text, program, Html)
+import Html.Attributes exposing (class)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Http
 import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2)
+import FormatNumber
+import FormatNumber.Locales exposing (usLocale)
 
 
 main =
@@ -193,8 +196,11 @@ ratingsRow : User -> List Float -> Html Msg
 ratingsRow user ratings =
     tr []
     ( td [] [ text user.name ]
-    :: List.map (\rating -> td [] [ text (toString rating) ]) ratings)
+    :: List.map (\rating -> td [ class "rating" ] [ text (formatRating rating) ]) ratings)
 
+formatRating : Float -> String
+formatRating rating =
+    FormatNumber.format usLocale rating
 
 extractItems : List UserRatings -> List String
 extractItems users =
@@ -227,7 +233,7 @@ ratings items ratings =
 
 rating : List Rating -> String -> Html Msg
 rating ratings item =
-    td [] [ score ratings item ]
+    td [ class "rating" ] [ score ratings item ]
 
 
 score : List Rating -> String -> Html Msg

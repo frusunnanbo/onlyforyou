@@ -12,6 +12,7 @@ table {
 td, th {
     border: 1px solid #aaaaaa;
     padding: 0.2rem 0.4rem;
+    width: 5rem;
 }
 
 tr:first-child th {
@@ -20,4 +21,8 @@ tr:first-child th {
 
 td:first-child, th:first-child {
     border-left: 0;
+}
+
+td.rating {
+    text-align: center;
 }
