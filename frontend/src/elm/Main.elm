@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Html exposing (table, tr, th, td, text, program, Html)
+import Html exposing (table, tr, th, td, div, text, program, Html)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Http
@@ -12,9 +12,9 @@ main =
 
 
 type alias Item =
-    {
-    name : String
+    { name : String
     }
+
 
 type alias Rating =
     { item : Item
@@ -27,47 +27,60 @@ type alias UserRatings =
     , ratings : List Rating
     }
 
+
 type alias User =
-    { name: String }
+    { name : String }
+
 
 type alias OptimizationState =
-    { users: List User
-    , items: List Item
-    , ratings: List (List Float)
+    { users : List User
+    , items : List Item
+    , ratings : List (List Float)
     }
+
 
 type alias Model =
-    { actualRatings: List UserRatings
-    , optimizationState: OptimizationState
+    { actualRatings : List UserRatings
+    , optimizationState : OptimizationState
     }
 
+
 initialUsers : List User
-initialUsers = [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva" ]
+initialUsers =
+    [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva" ]
+
 
 initialItems : List Item
-initialItems = [ Item "Greta Gris", Item "Hela Sverige Bakar" ]
+initialItems =
+    [ Item "Greta Gris", Item "Hela Sverige Bakar" ]
+
 
 initialOptimizationState : OptimizationState
-initialOptimizationState = { users = initialUsers, items = initialItems, ratings = [] }
+initialOptimizationState =
+    { users = initialUsers, items = initialItems, ratings = [] }
 
-init : (Model, Cmd Msg)
+
+init : ( Model, Cmd Msg )
 init =
-    ({ actualRatings = [], optimizationState = initialOptimizationState}, fetchNextState)
+    ( { actualRatings = [], optimizationState = initialOptimizationState }, fetchNextState )
 
 
 type Msg
     = Next
     | NewState (Result Http.Error (List UserRatings))
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Next ->
-            (model, fetchNextState)
+            ( model, fetchNextState )
+
         NewState (Ok newUserData) ->
-            ({ model | actualRatings = newUserData}, Cmd.none)
+            ( { model | actualRatings = newUserData }, Cmd.none )
+
         NewState (Err msg) ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
 
 
 fetchNextState : Cmd Msg
@@ -75,9 +88,11 @@ fetchNextState =
     Http.get "/userdata" decodeUserData
         |> Http.send NewState
 
-decodeUserData: Decoder (List UserRatings)
+
+decodeUserData : Decoder (List UserRatings)
 decodeUserData =
     list user
+
 
 user : Decoder UserRatings
 user =
@@ -86,19 +101,45 @@ user =
 
 decodeRating : Decoder Rating
 decodeRating =
-    map2 Rating item (at ["score", "score"] float)
+    map2 Rating item (at [ "score", "score" ] float)
+
 
 item : Decoder Item
-item = map Item (at ["video", "name"] string)
+item =
+    map Item (at [ "video", "name" ] string)
+
 
 view : Model -> Html Msg
 view model =
     let
-        userRatings = model.actualRatings
-        items = extractItems userRatings
+        userRatings =
+            model.actualRatings
+
+        items =
+            extractItems userRatings
     in
-        table []
-            (heading items :: List.map (row items) userRatings)
+        div []
+            [ table []
+                (heading items :: List.map (row items) userRatings)
+            , optimizationView model.optimizationState
+            ]
+
+
+optimizationView : OptimizationState -> Html Msg
+optimizationView optimizationState =
+    table []
+          (itemsHeading optimizationState.items
+          :: ratingsRow optimizationState.users optimizationState.ratings)
+
+itemsHeading : List Item -> Html Msg
+itemsHeading items =
+    tr []
+    (th [] []
+    :: List.map (\item -> th [] [ text item.name ]) items)
+
+ratingsRow : List User -> List (List Float) -> List (Html Msg)
+ratingsRow users ratings =
+    List.map (\user -> tr [] [ td [] [ text user.name ]]) users
 
 extractItems : List UserRatings -> List String
 extractItems users =
@@ -106,27 +147,33 @@ extractItems users =
         |> Set.fromList
         |> Set.toList
 
+
 extractUserItems : UserRatings -> List String
 extractUserItems user =
     List.map (\rating -> rating.item.name) user.ratings
 
+
 heading : List String -> Html Msg
 heading items =
     tr []
-        (th [] [text ""] :: List.map (\item ->  th [] [ text item ]) items)
+        (th [] [ text "" ] :: List.map (\item -> th [] [ text item ]) items)
+
 
 row : List String -> UserRatings -> Html Msg
 row items user =
     tr []
         (td [] [ text user.name ] :: (ratings items) user.ratings)
 
+
 ratings : List String -> List Rating -> List (Html Msg)
 ratings items ratings =
-   List.map (rating ratings) items
+    List.map (rating ratings) items
+
 
 rating : List Rating -> String -> Html Msg
 rating ratings item =
     td [] [ score ratings item ]
+
 
 score : List Rating -> String -> Html Msg
 score ratings itemName =
@@ -135,8 +182,9 @@ score ratings itemName =
         |> Maybe.withDefault ""
         |> text
 
+
 toDict : List Rating -> Dict String Float
 toDict ratings =
     ratings
-        |> List.map (\rating -> (rating.item.name, rating.score))
+        |> List.map (\rating -> ( rating.item.name, rating.score ))
         |> Dict.fromList
