@@ -8,6 +8,7 @@ import se.frusunnanbo.onlyforyou.model.Video;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -48,6 +49,7 @@ public class UserData {
         return users.stream()
                 .flatMap(user -> user.getRatings().stream().map(Rating::getVideo))
                 .distinct()
+                .sorted(Comparator.comparing(Video::getName))
                 .collect(toList());
     }
 
