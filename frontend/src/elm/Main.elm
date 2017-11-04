@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Html exposing (table, tr, th, td, div, button, text, program, Html)
 import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Http
@@ -61,6 +62,7 @@ init =
 type Msg
     = InitialData (Result Http.Error (List UserRatings))
     | CurrentState (Result Http.Error OptimizationState)
+    | Next
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,6 +79,10 @@ update msg model =
 
         CurrentState (Err msg) ->
             ( model, Cmd.none )
+
+        Next ->
+            (model, getNextOptimizationState)
+
 
 
 withNewRatings : OptimizationState -> List (List Float) -> OptimizationState
@@ -95,6 +101,12 @@ fetchInitialState =
 fetchCurrentOptimizationState : Cmd Msg
 fetchCurrentOptimizationState =
     Http.get "/currentstate" decodeCurrentState
+        |> Http.send CurrentState
+
+
+getNextOptimizationState : Cmd Msg
+getNextOptimizationState =
+    Http.post "/currentstate/next" Http.emptyBody decodeCurrentState
         |> Http.send CurrentState
 
 
@@ -164,7 +176,7 @@ optimizationView optimizationState =
 nextButton : Html Msg
 nextButton =
     div [ class "nextbutton" ]
-        [ button [] [ text "Next" ] ]
+        [ button [ onClick Next ] [ text "Next" ] ]
 
 
 itemsHeading : List Item -> Html Msg
