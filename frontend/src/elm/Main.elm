@@ -4,14 +4,17 @@ import Html exposing (table, tr, th, td, text, program, Html)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Http
-import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map2)
+import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2)
 
 
 main =
     program { init = init, update = update, view = view, subscriptions = \_ -> Sub.none }
 
 
-type alias Item = String
+type alias Item =
+    {
+    name : String
+    }
 
 type alias Rating =
     { item : Item
@@ -38,15 +41,18 @@ type alias Model =
     , optimizationState: OptimizationState
     }
 
+initialUsers : List User
+initialUsers = [ User "Anna", User "Britta", User "Carin", User "Dilba", User "Eva" ]
+
+initialItems : List Item
+initialItems = [ Item "Greta Gris", Item "Hela Sverige Bakar" ]
+
 initialOptimizationState : OptimizationState
-initialOptimizationState = { users = [], items = [], ratings = [] }
+initialOptimizationState = { users = initialUsers, items = initialItems, ratings = [] }
 
 init : (Model, Cmd Msg)
 init =
-    ({
-    actualRatings = []
-    , optimizationState = initialOptimizationState
-    }, fetchNextState)
+    ({ actualRatings = [], optimizationState = initialOptimizationState}, fetchNextState)
 
 
 type Msg
@@ -80,7 +86,10 @@ user =
 
 decodeRating : Decoder Rating
 decodeRating =
-    map2 Rating (at ["video", "name"] string) (at ["score", "score"] float)
+    map2 Rating item (at ["score", "score"] float)
+
+item : Decoder Item
+item = map Item (at ["video", "name"] string)
 
 view : Model -> Html Msg
 view model =
@@ -99,35 +108,35 @@ extractItems users =
 
 extractUserItems : UserRatings -> List String
 extractUserItems user =
-    List.map (\rating -> rating.item) user.ratings
+    List.map (\rating -> rating.item.name) user.ratings
 
-heading : List Item -> Html Msg
+heading : List String -> Html Msg
 heading items =
     tr []
         (th [] [text ""] :: List.map (\item ->  th [] [ text item ]) items)
 
-row : List Item -> UserRatings -> Html Msg
+row : List String -> UserRatings -> Html Msg
 row items user =
     tr []
         (td [] [ text user.name ] :: (ratings items) user.ratings)
 
-ratings : List Item -> List Rating -> List (Html Msg)
+ratings : List String -> List Rating -> List (Html Msg)
 ratings items ratings =
    List.map (rating ratings) items
 
-rating : List Rating -> Item -> Html Msg
+rating : List Rating -> String -> Html Msg
 rating ratings item =
     td [] [ score ratings item ]
 
-score : List Rating -> Item -> Html Msg
-score ratings item =
-    Dict.get item (toDict ratings)
+score : List Rating -> String -> Html Msg
+score ratings itemName =
+    Dict.get itemName (toDict ratings)
         |> Maybe.map toString
         |> Maybe.withDefault ""
         |> text
 
-toDict : List Rating -> Dict Item Float
+toDict : List Rating -> Dict String Float
 toDict ratings =
     ratings
-        |> List.map (\rating -> (rating.item, rating.score))
+        |> List.map (\rating -> (rating.item.name, rating.score))
         |> Dict.fromList
