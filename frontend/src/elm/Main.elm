@@ -152,7 +152,10 @@ ratingsRows users ratings =
 
 ratingsRow : User -> List Float -> Html Msg
 ratingsRow user ratings =
-    tr [] [ td [] [ text user.name ]]
+    tr []
+    ( td [] [ text user.name ]
+    :: List.map (\rating -> td [] [ text (toString rating) ]) ratings)
+
 
 extractItems : List UserRatings -> List String
 extractItems users =
