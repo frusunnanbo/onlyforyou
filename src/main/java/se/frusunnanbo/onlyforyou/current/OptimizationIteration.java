@@ -52,14 +52,14 @@ public class OptimizationIteration {
         if (fixedFeatures.equals(USER)) {
             return userFeatures;
         }
-        return leastSquareSolver.solve(itemFeatures);
+        return leastSquareSolver.solve(itemFeatures, true);
     }
 
     private SimpleMatrix nextItemFeatures() {
         if (fixedFeatures.equals(ITEM)) {
             return itemFeatures;
         }
-        return leastSquareSolver.solve(userFeatures);
+        return leastSquareSolver.solve(userFeatures, false);
     }
 
     private FixedFeatures nextFixedFeatures() {

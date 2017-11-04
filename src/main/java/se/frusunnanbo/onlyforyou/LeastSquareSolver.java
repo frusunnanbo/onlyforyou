@@ -2,6 +2,8 @@ package se.frusunnanbo.onlyforyou;
 
 import org.ejml.simple.SimpleMatrix;
 
+import java.util.Random;
+
 public class LeastSquareSolver {
 
     private final SimpleMatrix responses;
@@ -15,19 +17,41 @@ public class LeastSquareSolver {
         this.lambda = lambda;
     }
 
-    public SimpleMatrix solve(SimpleMatrix regressors) {
-        final SimpleMatrix result = regressors.copy();
+    public SimpleMatrix solve(SimpleMatrix regressors, boolean regressorsAreItems) {
+        final SimpleMatrix result = SimpleMatrix.random(numRows(regressorsAreItems), regressors.numCols(), 0, 0, new Random());
         for (int i = 0; i < result.numRows(); i++) {
-            result.insertIntoThis(i, 0, solveRow(regressors, i));
+            final SimpleMatrix rowConfidence
+                    = SimpleMatrix.diag(confidence.extractVector(regressorsAreItems, i).getMatrix().getData());
+            final SimpleMatrix rowResponses = verticalRowResponses(regressorsAreItems, i);
+            result.insertIntoThis(i, 0, solveRow(regressors, rowResponses, rowConfidence));
         }
         return result;
     }
 
-    private SimpleMatrix solveRow(SimpleMatrix regressors, int row) {
-        SimpleMatrix rowConfidence = SimpleMatrix.diag(confidence.extractVector(true, row).getMatrix().getData());
-        SimpleMatrix rowResponses = responses.extractVector(true, row);
-        return (regressors.transpose().mult(rowConfidence).mult(regressors).plus(lambda, SimpleMatrix.identity(regressors.numCols()))).invert()
-                .mult(regressors.transpose()).mult(rowConfidence).mult(rowResponses.transpose())
+    private SimpleMatrix verticalRowResponses(boolean regressorsAreItems, int i) {
+        final SimpleMatrix rowResponses = responses.extractVector(regressorsAreItems, i);
+        if (regressorsAreItems) {
+            return rowResponses.transpose();
+        }
+        return rowResponses;
+    }
+
+    private int numRows(boolean regressorsAreItems) {
+        if (regressorsAreItems) {
+            return responses.numRows();
+        }
+        return responses.numCols();
+    }
+
+    private SimpleMatrix solveRow(SimpleMatrix regressors, SimpleMatrix rowResponses, SimpleMatrix rowConfidence) {
+        return (regressors.transpose()
+                .mult(rowConfidence)
+                .mult(regressors)
+                .plus(lambda, SimpleMatrix.identity(regressors.numCols())))
+                .invert()
+                .mult(regressors.transpose())
+                .mult(rowConfidence)
+                .mult(rowResponses)
                 .transpose();
     }
 }

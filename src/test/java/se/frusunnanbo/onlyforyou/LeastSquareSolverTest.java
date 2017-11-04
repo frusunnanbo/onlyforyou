@@ -17,7 +17,7 @@ public class LeastSquareSolverTest {
     public void simplest_possible_case() {
         final SimpleMatrix ratings = oneElementMatrix(1.0);
         final SimpleMatrix itemFeatures = oneElementMatrix(1.0);
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(1), 0).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(1), 0).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(1));
         assertThat(solution).has(numberOfColumns(1));
         assertThat(solution).has(elements(1.0));
@@ -27,7 +27,7 @@ public class LeastSquareSolverTest {
     public void one_nonone_element() {
         final SimpleMatrix ratings = oneElementMatrix(4.0);
         final SimpleMatrix itemFeatures = oneElementMatrix(2.0);
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(1), 0).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(1), 0).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(1));
         assertThat(solution).has(numberOfColumns(1));
         assertThat(solution).has(elements(2.0));
@@ -37,7 +37,7 @@ public class LeastSquareSolverTest {
     public void one_feature_two_users_two_items() {
         final SimpleMatrix ratings = twoByTwoMatrix(1, 1, 1, 1);
         final SimpleMatrix itemFeatures = vector(1, 1);
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(2), 0).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(2), 0).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(2));
         assertThat(solution).has(numberOfColumns(1));
         assertThat(solution).has(elements(1.0, 1.0));
@@ -54,7 +54,7 @@ public class LeastSquareSolverTest {
                 {3, 4},
                 {5, 6},
         });
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(3), 0).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, fullConfidence(3), 0).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(3));
         assertThat(solution).has(numberOfColumns(2));
         assertThat(solution).has(elements(1.0, 4.0, 2.0, 5.0, 3.0, 6.0));
@@ -76,7 +76,7 @@ public class LeastSquareSolverTest {
                 {0, 1, 1},
                 {1, 1, 0}
         });
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, knowns, 0).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, knowns, 0).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(3));
         assertThat(solution).has(numberOfColumns(2));
         assertThat(solution).has(elements(1.0, 4.0, 2.0, 5.0, 3.0, 6.0));
@@ -98,7 +98,7 @@ public class LeastSquareSolverTest {
                 {0, 1, 1},
                 {1, 1, 0}
         });
-        final SimpleMatrix solution = new LeastSquareSolver(ratings, knowns, 0.01).solve(itemFeatures);
+        final SimpleMatrix solution = new LeastSquareSolver(ratings, knowns, 0.01).solve(itemFeatures, true);
         assertThat(solution).has(numberOfRows(3));
         assertThat(solution).has(numberOfColumns(2));
         assertThat(solution).has(elementsCloseButNotEqualTo(1.0, 4.0, 2.0, 5.0, 3.0, 6.0));
