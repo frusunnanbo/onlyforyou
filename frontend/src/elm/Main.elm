@@ -84,37 +84,59 @@ initialOptimizationState =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { actualRatings = [], optimizationState = initialOptimizationState }, fetchNextState )
+    ( { actualRatings = [], optimizationState = initialOptimizationState }, fetchInitialState )
 
 
 type Msg
-    = Next
-    | NewState (Result Http.Error (List UserRatings))
+    = InitialData (Result Http.Error (List UserRatings))
+    | CurrentState (Result Http.Error (List (List Float)))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Next ->
-            ( model, fetchNextState )
-
-        NewState (Ok newUserData) ->
+        InitialData (Ok newUserData) ->
             ( { model | actualRatings = newUserData }, Cmd.none )
 
-        NewState (Err msg) ->
+        InitialData (Err msg) ->
             ( model, Cmd.none )
 
+        CurrentState (Ok currentRatings) ->
+            ( { model | optimizationState = withNewRatings model.optimizationState currentRatings }, Cmd.none )
 
-fetchNextState : Cmd Msg
-fetchNextState =
-    Http.get "/userdata" decodeUserData
-        |> Http.send NewState
+        CurrentState (Err msg) ->
+            ( model, Cmd.none )
 
+withNewRatings : OptimizationState -> List (List Float) -> OptimizationState
+withNewRatings state ratings =
+    { state | ratings = ratings }
+
+fetchInitialState : Cmd Msg
+fetchInitialState =
+    Cmd.batch [
+        fetchInitialUserData,
+        fetchCurrentOptimizationState
+    ]
+
+
+fetchCurrentOptimizationState : Cmd Msg
+fetchCurrentOptimizationState =
+     Http.get "/currentstate" decodeCurrentState
+            |> Http.send CurrentState
+
+
+fetchInitialUserData : Cmd Msg
+fetchInitialUserData =
+     Http.get "/userdata" decodeUserData
+            |> Http.send InitialData
+
+decodeCurrentState : Decoder (List (List Float))
+decodeCurrentState =
+    (field "ratings" (list (list float)))
 
 decodeUserData : Decoder (List UserRatings)
 decodeUserData =
     list user
-
 
 user : Decoder UserRatings
 user =
