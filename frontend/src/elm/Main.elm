@@ -9,6 +9,7 @@ import Http
 import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2, map3)
 import FormatNumber
 import FormatNumber.Locales exposing (usLocale)
+import UserRatings
 
 
 main =
@@ -16,8 +17,7 @@ main =
 
 
 type alias Item =
-    { name : String
-    }
+    { name : String }
 
 
 type alias Rating =
@@ -61,6 +61,7 @@ init =
 
 type Msg
     = InitialData (Result Http.Error (List UserRatings))
+    | UserRatingsFetched (Result Http.Error UserRatings.UserRatings)
     | CurrentState (Result Http.Error OptimizationState)
     | Next
 
@@ -72,6 +73,12 @@ update msg model =
             ( { model | actualRatings = newUserData }, Cmd.none )
 
         InitialData (Err msg) ->
+            ( model, Cmd.none )
+
+        UserRatingsFetched (Ok userRatings) ->
+            ( model, Cmd.none )
+
+        UserRatingsFetched (Err msg) ->
             ( model, Cmd.none )
 
         CurrentState (Ok optimizationState) ->
@@ -94,6 +101,7 @@ fetchInitialState : Cmd Msg
 fetchInitialState =
     Cmd.batch
         [ fetchInitialUserData
+        , UserRatings.fetchUserRatings UserRatingsFetched
         , fetchCurrentOptimizationState
         ]
 
