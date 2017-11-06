@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -55,28 +54,5 @@ public class UserData {
 
     private static int getColumnNumber(Rating rating, List<Video> videos) {
         return videos.indexOf(rating.getVideo());
-    }
-
-
-    public static Collection<Collection<Optional<Double>>> ratings(Collection<User> users) {
-        List<Video> videos = items(users);
-
-        return users.stream()
-                .filter(user -> !user.getRatings().isEmpty())
-                .map(user -> mapRatingsToVideos(user.getRatings(), videos))
-                .collect(toList());
-    }
-
-    private static Collection<Optional<Double>> mapRatingsToVideos(Collection<Rating> ratings, List<Video> videos) {
-        return videos.stream()
-                .map(video -> userRatingForVideo(ratings, video))
-                .collect(toList());
-    }
-
-    private static Optional<Double> userRatingForVideo(Collection<Rating> ratings, Video video) {
-        return ratings.stream()
-                .filter(rating -> video.equals(rating.getVideo()))
-                .findAny()
-                .map(rating -> (double) rating.getScore().getScore());
     }
 }
