@@ -1,11 +1,11 @@
 package se.frusunnanbo.onlyforyou.current;
 
-import org.assertj.core.data.Percentage;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 import se.frusunnanbo.onlyforyou.input.UserData;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 
 public class OptimizationIterationTest {
 
@@ -62,19 +62,19 @@ public class OptimizationIterationTest {
             iteration = iteration.next();
         }
         assertThat(loss(iteration))
-                .isCloseTo(loss(iteration.next()), Percentage.withPercentage(0.0001));
+                .isCloseTo(loss(iteration.next()), offset(0.001));
     }
 
     @Test
     public void loss_converges_with_demo_data() {
         OptimizationIteration iteration = OptimizationIteration.initial(10, UserData.ratingsMatrix(UserData.users()));
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 20; i++) {
             System.out.println("LOSS: " + loss(iteration));
             System.out.println(new SimpleMatrix(iteration.estimations()));
             iteration = iteration.next();
         }
         assertThat(loss(iteration))
-                .isCloseTo(loss(iteration.next()), Percentage.withPercentage(0.1));
+                .isCloseTo(loss(iteration.next()), offset(0.01));
     }
 
     private double loss(OptimizationIteration iteration) {

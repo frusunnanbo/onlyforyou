@@ -18,7 +18,7 @@ public class LossTest {
     @Test
     public void loss_of_scalars_is_the_square_of_diff() {
         RatingsMatrix ratings = RatingsMatrix.empty(1, 1)
-                .add(0, 0, 8.0);
+                .add(0, 0, 8);
         assertThat(ratings.loss(new double[][]{{6.0}}))
                 .isEqualTo(4.0);
 
@@ -27,17 +27,17 @@ public class LossTest {
     @Test
     public void averages_multiple_error_factors() {
         RatingsMatrix ratings = RatingsMatrix.empty(1, 2)
-                .add(0, 0, 2.0)
-                .add(0, 1, 3.0);
-        assertThat(ratings.loss(new double[][]{{4.0, 3.0}}))
-                .isEqualTo(2.0);
+                .add(0, 0, 2)
+                .add(0, 1, 3);
+        assertThat(ratings.loss(new double[][]{{4, 3}}))
+                .isEqualTo(2);
     }
 
     @Test
     public void empty_values_count_as_no_loss() {
         RatingsMatrix ratings = RatingsMatrix.empty(1, 1);
 
-        assertThat(ratings.loss(new double[][]{{7.0}}))
+        assertThat(ratings.loss(new double[][]{{7}}))
                 .isEqualTo(0);
     }
 

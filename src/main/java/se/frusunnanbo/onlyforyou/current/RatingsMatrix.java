@@ -19,9 +19,9 @@ public class RatingsMatrix {
 
     private final int numRows;
     private final int numCols;
-    private final Map<Index, Double> ratings;
+    private final Map<Index, Integer> ratings;
 
-    private RatingsMatrix(int numRows, int numCols, Map<Index, Double> ratings) {
+    private RatingsMatrix(int numRows, int numCols, Map<Index, Integer> ratings) {
         this.numRows = numRows;
         this.numCols = numCols;
         this.ratings = ratings;
@@ -36,7 +36,7 @@ public class RatingsMatrix {
     }
 
     public static RatingsMatrix of(int numRows, int numCols, Collection<Element> elements) {
-        final Map<Index, Double> ratingsMap = elements.stream().collect(toMap(e -> Index.index(e.row, e.column), e -> e.value));
+        final Map<Index, Integer> ratingsMap = elements.stream().collect(toMap(e -> Index.index(e.row, e.column), e -> e.value));
         return new RatingsMatrix(numRows, numCols, ratingsMap);
     }
 
@@ -44,9 +44,9 @@ public class RatingsMatrix {
         return new RatingsMatrix(numRows, numCols);
     }
 
-    public RatingsMatrix add(int i, int j, double rating) {
-        final ImmutableMap<Index, Double> newRatings
-                = ImmutableMap.<Index, Double>builder().put(new Index(i, j), rating).putAll(ratings).build();
+    public RatingsMatrix add(int i, int j, int rating) {
+        final ImmutableMap<Index, Integer> newRatings
+                = ImmutableMap.<Index, Integer>builder().put(new Index(i, j), rating).putAll(ratings).build();
         return new RatingsMatrix(numRows, numCols, newRatings);
     }
 
@@ -92,12 +92,12 @@ public class RatingsMatrix {
                 .collect(Collectors.toList());
     }
 
-    private double error(Map.Entry<Index, Double> entry, double[][] estimations) {
+    private double error(Map.Entry<Index, Integer> entry, double[][] estimations) {
         final Index index = index(entry);
         return entry.getValue() - estimations[index.i][index.j];
     }
 
-    private Index index(Map.Entry<Index, Double> entry) {
+    private Index index(Map.Entry<Index, Integer> entry) {
         return entry.getKey();
     }
 
@@ -115,9 +115,9 @@ public class RatingsMatrix {
     public static class Element {
         private final int row;
         private final int column;
-        private final double value;
+        private final int value;
 
-        public static Element element(int row, int column, double value) {
+        public static Element element(int row, int column, int value) {
             return new Element(row, column, value);
         }
     }

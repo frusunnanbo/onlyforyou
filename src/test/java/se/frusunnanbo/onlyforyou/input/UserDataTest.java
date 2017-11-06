@@ -45,8 +45,8 @@ public class UserDataTest {
                 rating("Sista tangon i Paris", 4))));
         assertThat(ratings).has(dimensions(1, 2));
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 0, 9.0),
-                element(0, 1, 4.0));
+                element(0, 0, 9),
+                element(0, 1, 4));
     }
 
     @Test
@@ -59,8 +59,8 @@ public class UserDataTest {
                                 rating("Smultronstället", 5))));
         assertThat(ratings).has(dimensions(2, 1));
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 0, 6.0),
-                element(1, 0, 5.0));
+                element(0, 0, 6),
+                element(1, 0, 5));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class UserDataTest {
                 {1, 0}
         });
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 0, 7.0),
-                element(1, 1, 3.0));
+                element(0, 1, 7),
+                element(1, 0, 3));
     }
 
     private Condition<RatingsMatrix> dimensions(int i, int j) {
