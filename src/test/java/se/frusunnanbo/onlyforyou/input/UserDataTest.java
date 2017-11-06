@@ -8,7 +8,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.frusunnanbo.onlyforyou.current.RatingsMatrix.Element.element;
+import static se.frusunnanbo.onlyforyou.current.UserRating.userRating;
 import static se.frusunnanbo.onlyforyou.input.UserData.ratingsMatrix;
 import static se.frusunnanbo.onlyforyou.model.Rating.rating;
 import static se.frusunnanbo.onlyforyou.model.User.user;
@@ -35,7 +35,7 @@ public class UserDataTest {
     public void user_with_one_rating_gives_one_by_one_matrix() {
         final RatingsMatrix ratings = ratingsMatrix(singletonList(user("Ulla", rating("Stranger things", 8))));
         assertThat(ratings).has(dimensions(1, 1));
-        assertThat(ratings.knownElements()).containsExactlyInAnyOrder(element(0, 0, 8));
+        assertThat(ratings.knownElements()).containsExactlyInAnyOrder(userRating(0, 0, 8));
     }
 
     @Test
@@ -45,8 +45,8 @@ public class UserDataTest {
                 rating("Sista tangon i Paris", 4))));
         assertThat(ratings).has(dimensions(1, 2));
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 0, 9),
-                element(0, 1, 4));
+                userRating(0, 0, 9),
+                userRating(0, 1, 4));
     }
 
     @Test
@@ -59,8 +59,8 @@ public class UserDataTest {
                                 rating("Smultronstället", 5))));
         assertThat(ratings).has(dimensions(2, 1));
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 0, 6),
-                element(1, 0, 5));
+                userRating(0, 0, 6),
+                userRating(1, 0, 5));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class UserDataTest {
                 {1, 0}
         });
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                element(0, 1, 7),
-                element(1, 0, 3));
+                userRating(0, 1, 7),
+                userRating(1, 0, 3));
     }
 
     private Condition<RatingsMatrix> dimensions(int i, int j) {

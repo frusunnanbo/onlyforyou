@@ -31,16 +31,18 @@ public class RatingsMatrix {
         this(numRows, numCols, ImmutableMap.of());
     }
 
-    public static RatingsMatrix of(int numRows, int numCols, Element... elements) {
+    public static RatingsMatrix of(int numRows, int numCols, UserRating... elements) {
         return of(numRows, numCols, asList(elements));
     }
 
-    public static RatingsMatrix of(int numRows, int numCols, Collection<Element> elements) {
-        final Map<Index, Integer> ratingsMap = elements.stream().collect(toMap(e -> Index.index(e.row, e.column), e -> e.value));
+    public static RatingsMatrix of(int numRows, int numCols, Collection<UserRating> elements) {
+        final Map<Index, Integer> ratingsMap = elements.stream()
+                .collect(toMap(e -> Index.index(e.getUserIndex(), e.getItemIndex()), UserRating::getValue));
         return new RatingsMatrix(numRows, numCols, ratingsMap);
     }
 
     public static RatingsMatrix empty(int numRows, int numCols) {
+
         return new RatingsMatrix(numRows, numCols);
     }
 
@@ -86,9 +88,9 @@ public class RatingsMatrix {
         return ratings.isEmpty();
     }
 
-    public Collection<Element> knownElements() {
+    public Collection<UserRating> knownElements() {
         return ratings.entrySet().stream()
-                .map(entry -> Element.element(entry.getKey().i, entry.getKey().j, entry.getValue()))
+                .map(entry -> UserRating.userRating(entry.getKey().i, entry.getKey().j, entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -110,16 +112,4 @@ public class RatingsMatrix {
             return new Index(i, j);
         }
     }
-
-    @Value
-    public static class Element {
-        private final int row;
-        private final int column;
-        private final int value;
-
-        public static Element element(int row, int column, int value) {
-            return new Element(row, column, value);
-        }
-    }
-
 }

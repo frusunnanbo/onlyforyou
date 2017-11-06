@@ -1,6 +1,7 @@
 package se.frusunnanbo.onlyforyou.input;
 
 import se.frusunnanbo.onlyforyou.current.RatingsMatrix;
+import se.frusunnanbo.onlyforyou.current.UserRating;
 import se.frusunnanbo.onlyforyou.model.Rating;
 import se.frusunnanbo.onlyforyou.model.User;
 import se.frusunnanbo.onlyforyou.model.Video;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
-import static se.frusunnanbo.onlyforyou.current.RatingsMatrix.Element.element;
+import static se.frusunnanbo.onlyforyou.current.UserRating.userRating;
 import static se.frusunnanbo.onlyforyou.model.Rating.rating;
 import static se.frusunnanbo.onlyforyou.model.User.user;
 
@@ -35,9 +36,9 @@ public class UserData {
         List<Video> videos = items(users);
 
         final List<User> userList = new ArrayList<>(users);
-        final List<RatingsMatrix.Element> elements = IntStream.range(0, users.size())
+        final List<UserRating> elements = IntStream.range(0, users.size())
                 .mapToObj(i -> userList.get(i).getRatings().stream()
-                        .map(rating -> element(i, getColumnNumber(rating, videos), rating.getScore().getScore())))
+                        .map(rating -> userRating(i, getColumnNumber(rating, videos), rating.getScore().getScore())))
                 .flatMap(s -> s)
                 .collect(toList());
 
