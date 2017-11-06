@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import se.frusunnanbo.onlyforyou.model.UserRating;
 
 import java.util.Arrays;
 import java.util.Collection;

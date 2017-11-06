@@ -1,4 +1,4 @@
-package se.frusunnanbo.onlyforyou.current;
+package se.frusunnanbo.onlyforyou.model;
 
 import lombok.Value;
 
