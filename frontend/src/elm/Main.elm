@@ -19,19 +19,6 @@ main =
 type alias Item =
     { name : String }
 
-
-type alias Rating =
-    { item : Item
-    , score : Float
-    }
-
-
-type alias UserRatings =
-    { name : String
-    , ratings : List Rating
-    }
-
-
 type alias User =
     { name : String }
 
@@ -44,8 +31,7 @@ type alias OptimizationState =
 
 
 type alias Model =
-    { actualRatings : List UserRatings
-    , userRatings: UserRatings.UserRatings
+    { userRatings: UserRatings.UserRatings
     , optimizationState : OptimizationState
     }
 
@@ -57,15 +43,11 @@ initialOptimizationState =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { actualRatings = []
-    , userRatings = UserRatings.initialUserRatings
-    , optimizationState = initialOptimizationState },
-    fetchInitialState )
+    ( { userRatings = UserRatings.initialUserRatings, optimizationState = initialOptimizationState }, fetchInitialState )
 
 
 type Msg
-    = InitialData (Result Http.Error (List UserRatings))
-    | UserRatingsFetched (Result Http.Error UserRatings.UserRatings)
+    = UserRatingsFetched (Result Http.Error UserRatings.UserRatings)
     | CurrentState (Result Http.Error OptimizationState)
     | Next
 
@@ -73,11 +55,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        InitialData (Ok newUserData) ->
-            ( { model | actualRatings = newUserData }, Cmd.none )
-
-        InitialData (Err msg) ->
-            ( model, Cmd.none )
 
         UserRatingsFetched (Ok userRatings) ->
             ( { model | userRatings = userRatings }, Cmd.none )
@@ -104,8 +81,7 @@ withNewRatings state ratings =
 fetchInitialState : Cmd Msg
 fetchInitialState =
     Cmd.batch
-        [ fetchInitialUserData
-        , fetchUserRatings
+        [ fetchUserRatings
         , fetchCurrentOptimizationState
         ]
 
@@ -125,12 +101,6 @@ getNextOptimizationState =
         |> Http.send CurrentState
 
 
-fetchInitialUserData : Cmd Msg
-fetchInitialUserData =
-    Http.get "/userdata" decodeUserData
-        |> Http.send InitialData
-
-
 decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
     map3 OptimizationState (field "users" (list user)) (field "items" (list item)) (field "ratings" (list (list float)))
@@ -140,22 +110,6 @@ user : Decoder User
 user =
     map User (field "name" string)
 
-
-decodeUserData : Decoder (List UserRatings)
-decodeUserData =
-    list userRatings
-
-
-userRatings : Decoder UserRatings
-userRatings =
-    map2 UserRatings (field "name" string) (field "ratings" (list decodeRating))
-
-
-decodeRating : Decoder Rating
-decodeRating =
-    map2 Rating (field "video" item) (at [ "score", "score" ] float)
-
-
 item : Decoder Item
 item =
     map Item (field "name" string)
@@ -163,17 +117,8 @@ item =
 
 view : Model -> Html Msg
 view model =
-    let
-        userRatings =
-            model.actualRatings
-
-        items =
-            extractItems userRatings
-    in
         div []
             [ UserRatings.renderUserRatings model.userRatings
-            , table []
-                (heading items :: List.map (row items) userRatings)
             , optimizationView model.optimizationState
             ]
 
@@ -221,50 +166,7 @@ formatRating rating =
     FormatNumber.format usLocale rating
 
 
-extractItems : List UserRatings -> List String
-extractItems users =
-    List.concatMap extractUserItems users
-        |> Set.fromList
-        |> Set.toList
-
-
-extractUserItems : UserRatings -> List String
-extractUserItems user =
-    List.map (\rating -> rating.item.name) user.ratings
-
-
 heading : List String -> Html Msg
 heading items =
     tr []
         (th [] [ text "" ] :: List.map (\item -> th [] [ text item ]) items)
-
-
-row : List String -> UserRatings -> Html Msg
-row items user =
-    tr []
-        (td [] [ text user.name ] :: (ratings items) user.ratings)
-
-
-ratings : List String -> List Rating -> List (Html Msg)
-ratings items ratings =
-    List.map (rating ratings) items
-
-
-rating : List Rating -> String -> Html Msg
-rating ratings item =
-    td [ class "rating" ] [ score ratings item ]
-
-
-score : List Rating -> String -> Html Msg
-score ratings itemName =
-    Dict.get itemName (toDict ratings)
-        |> Maybe.map toString
-        |> Maybe.withDefault ""
-        |> text
-
-
-toDict : List Rating -> Dict String Float
-toDict ratings =
-    ratings
-        |> List.map (\rating -> ( rating.item.name, rating.score ))
-        |> Dict.fromList
