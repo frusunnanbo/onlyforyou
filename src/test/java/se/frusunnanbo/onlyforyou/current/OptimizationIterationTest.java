@@ -67,7 +67,7 @@ public class OptimizationIterationTest {
 
     @Test
     public void loss_converges_with_demo_data() {
-        OptimizationIteration iteration = OptimizationIteration.initial(10, UserData.ratingsMatrix(UserData.users()));
+        OptimizationIteration iteration = OptimizationIteration.initial(10, UserData.ratingsMatrix(UserData.userRatings()));
         for (int i = 0; i < 30; i++) {
             System.out.println("LOSS: " + loss(iteration));
             System.out.println(new SimpleMatrix(iteration.estimations()));

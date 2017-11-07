@@ -7,7 +7,7 @@ import java.util.List;
 
 @Value
 public class UserRatingInput {
-    List<UserRatings> users;
+    List<User> users;
     List<Item> items;
     Collection<UserRating> ratings;
 }
