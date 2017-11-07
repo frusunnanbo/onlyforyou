@@ -4,6 +4,7 @@ import Html exposing (table, tr, th, td, div, button, text, Html)
 import Html.Attributes exposing (class)
 import Http
 import Array exposing (Array)
+import Matrix exposing (matrix, Matrix)
 import Json.Decode as Decode exposing (Decoder, decodeString, list, string, int, field, at, map, map2, map3)
 
 type alias UserRating =
@@ -51,7 +52,7 @@ renderUserRatings : UserRatings -> Html msg
 renderUserRatings userRatings =
     table []
                 (itemsHeading userRatings.items
-                    :: ratingsRows userRatings.users userRatings.ratings
+                    :: ratingsRows userRatings.users (toSparseMatrix userRatings)
                 )
 
 
@@ -63,14 +64,31 @@ itemsHeading items =
         )
 
 
-ratingsRows : List String -> List UserRating -> List (Html msg)
+ratingsRows : List String -> Matrix (Maybe Int) -> List (Html msg)
 ratingsRows users ratings =
-    List.map ratingsRow users
+    List.map2 ratingsRow users (Array.toList ratings)
 
 
-ratingsRow : String -> Html msg
-ratingsRow user =
+ratingsRow : String -> Array (Maybe Int) -> Html msg
+ratingsRow user ratings =
     tr []
-        [ td [] [ text user] ]
+        ( td [] [ text user]
+        :: List.map (\rating -> td [] [ text (formatRating rating) ]) (Array.toList ratings))
+
+formatRating : Maybe Int -> String
+formatRating rating =
+    rating
+        |> Maybe.map toString
+        |> Maybe.withDefault ""
+
+toSparseMatrix : UserRatings -> Matrix (Maybe Int)
+toSparseMatrix userRatings =
+    matrix (List.length userRatings.users) (List.length userRatings.items) (valueAt userRatings.ratings)
+
+valueAt : List UserRating -> Matrix.Location -> Maybe Int
+valueAt userRatings location =
+    List.filter (\rating -> (Matrix.row location) == rating.userIndex && (Matrix.col location) == rating.itemIndex) userRatings
+        |> List.head
+        |> Maybe.map (\rating -> rating.score)
 
 
