@@ -45,6 +45,7 @@ type alias OptimizationState =
 
 type alias Model =
     { actualRatings : List UserRatings
+    , userRatings: UserRatings.UserRatings
     , optimizationState : OptimizationState
     }
 
@@ -56,7 +57,10 @@ initialOptimizationState =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { actualRatings = [], optimizationState = initialOptimizationState }, fetchInitialState )
+    ( { actualRatings = []
+    , userRatings = UserRatings.initialUserRatings
+    , optimizationState = initialOptimizationState },
+    fetchInitialState )
 
 
 type Msg
@@ -76,7 +80,7 @@ update msg model =
             ( model, Cmd.none )
 
         UserRatingsFetched (Ok userRatings) ->
-            ( model, Cmd.none )
+            ( { model | userRatings = userRatings }, Cmd.none )
 
         UserRatingsFetched (Err msg) ->
             ( model, Cmd.none )
@@ -101,10 +105,13 @@ fetchInitialState : Cmd Msg
 fetchInitialState =
     Cmd.batch
         [ fetchInitialUserData
-        , UserRatings.fetchUserRatings UserRatingsFetched
+        , fetchUserRatings
         , fetchCurrentOptimizationState
         ]
 
+fetchUserRatings : Cmd Msg
+fetchUserRatings =
+    UserRatings.fetchUserRatings UserRatingsFetched
 
 fetchCurrentOptimizationState : Cmd Msg
 fetchCurrentOptimizationState =
@@ -164,7 +171,8 @@ view model =
             extractItems userRatings
     in
         div []
-            [ table []
+            [ UserRatings.renderUserRatings model.userRatings
+            , table []
                 (heading items :: List.map (row items) userRatings)
             , optimizationView model.optimizationState
             ]
