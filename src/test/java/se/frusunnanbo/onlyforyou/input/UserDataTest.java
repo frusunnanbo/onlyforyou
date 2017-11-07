@@ -10,8 +10,8 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.frusunnanbo.onlyforyou.input.UserData.ratingsMatrix;
 import static se.frusunnanbo.onlyforyou.model.Rating.rating;
-import static se.frusunnanbo.onlyforyou.model.User.user;
 import static se.frusunnanbo.onlyforyou.model.UserRating.userRating;
+import static se.frusunnanbo.onlyforyou.model.UserRatings.user;
 
 public class UserDataTest {
 

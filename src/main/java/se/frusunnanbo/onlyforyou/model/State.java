@@ -7,8 +7,8 @@ import java.util.Collection;
 @Value
 public class State {
 
-    Collection<User> users;
-    Collection<Video> items;
+    Collection<UserRatings> users;
+    Collection<Item> items;
     double loss;
     double[][] ratings;
 }

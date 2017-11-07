@@ -2,12 +2,15 @@ package se.frusunnanbo.onlyforyou.model;
 
 import lombok.Value;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @Value
 public class UserRatings {
-    List<User> users;
-    List<Video> items;
-    Collection<UserRating> ratings;
+    String name;
+    Collection<Rating> ratings;
+
+    public static UserRatings user(String name, Rating... ratings) {
+        return new UserRatings(name, Arrays.asList(ratings));
+    }
 }

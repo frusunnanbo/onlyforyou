@@ -4,10 +4,10 @@ import lombok.Value;
 
 @Value
 public class Rating {
-    Video video;
+    Item item;
     Score score;
 
     public static Rating rating(String videoName, int score) {
-        return new Rating(new Video(videoName), new Score(score));
+        return new Rating(new Item(videoName), new Score(score));
     }
 }
