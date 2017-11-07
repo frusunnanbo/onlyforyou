@@ -3,17 +3,19 @@ package se.frusunnanbo.onlyforyou.input;
 import org.assertj.core.api.Condition;
 import org.junit.Test;
 import se.frusunnanbo.onlyforyou.current.RatingsMatrix;
+import se.frusunnanbo.onlyforyou.model.UserRatings;
+
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.frusunnanbo.onlyforyou.input.UserData.ratingsMatrix;
 import static se.frusunnanbo.onlyforyou.model.Rating.rating;
 import static se.frusunnanbo.onlyforyou.model.UserRating.userRating;
 import static se.frusunnanbo.onlyforyou.model.UserRatings.user;
 
-public class UserDataTest {
+public class UserInputTest {
 
     @Test
     public void empty_userdata_gives_empty_ratings() {
@@ -79,6 +81,10 @@ public class UserDataTest {
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
                 userRating(0, 1, 7),
                 userRating(1, 0, 3));
+    }
+
+    private RatingsMatrix ratingsMatrix(List<UserRatings> userRatings) {
+        return UserInput.of(userRatings).toRatingsMatrix();
     }
 
     private Condition<RatingsMatrix> dimensions(int i, int j) {

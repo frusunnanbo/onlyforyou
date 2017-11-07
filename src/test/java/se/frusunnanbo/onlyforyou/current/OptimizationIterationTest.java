@@ -2,10 +2,10 @@ package se.frusunnanbo.onlyforyou.current;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
-import se.frusunnanbo.onlyforyou.input.UserData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
+import static se.frusunnanbo.onlyforyou.input.UserInput.userInput;
 
 public class OptimizationIterationTest {
 
@@ -67,7 +67,7 @@ public class OptimizationIterationTest {
 
     @Test
     public void loss_converges_with_demo_data() {
-        OptimizationIteration iteration = OptimizationIteration.initial(10, UserData.ratingsMatrix(UserData.userRatings()));
+        OptimizationIteration iteration = OptimizationIteration.initial(10, userInput().toRatingsMatrix());
         for (int i = 0; i < 30; i++) {
             System.out.println("LOSS: " + loss(iteration));
             System.out.println(new SimpleMatrix(iteration.estimations()));
