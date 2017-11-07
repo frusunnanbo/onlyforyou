@@ -28,10 +28,10 @@ public class Application {
         staticFiles.registerMimeType("html", "text/html; charset=utf-8");
 
         get("/userratings", (req, res) -> new UserRatingInput(users, items, userInput.userRatings()), gson::toJson);
-        get("/currentstate", (req, res) -> new State(users, items, current.loss(), current.estimations()), gson::toJson);
+        get("/currentstate", (req, res) -> new State(current.loss(), current.estimations()), gson::toJson);
         post("/currentstate/next", (req, res) -> {
             current.next();
-            return new State(users, items, current.loss(), current.estimations());
+            return new State(current.loss(), current.estimations());
         }, gson::toJson);
     }
 

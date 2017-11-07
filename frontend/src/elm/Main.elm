@@ -19,31 +19,38 @@ main =
 type alias Item =
     { name : String }
 
+
 type alias User =
     { name : String }
 
 
 type alias OptimizationState =
-    { users : List User
-    , items : List Item
-    , ratings : List (List Float)
+    { ratings : List (List Float)
     }
 
 
 type alias Model =
-    { userRatings: UserRatings.UserRatings
+    { users : List String
+    , items : List String
+    , userRatings : UserRatings.UserRatings
     , optimizationState : OptimizationState
     }
 
 
 initialOptimizationState : OptimizationState
 initialOptimizationState =
-    { users = [], items = [], ratings = [] }
+    { ratings = [] }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { userRatings = UserRatings.initialUserRatings, optimizationState = initialOptimizationState }, fetchInitialState )
+    ( { users = []
+      , items = []
+      , userRatings = UserRatings.initialUserRatings
+      , optimizationState = initialOptimizationState
+      }
+    , fetchInitialState
+    )
 
 
 type Msg
@@ -55,9 +62,13 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-
         UserRatingsFetched (Ok userRatings) ->
-            ( { model | userRatings = userRatings }, Cmd.none )
+            ( model
+                |> withUsers userRatings.users
+                |> withItems userRatings.items
+                |> withRatings userRatings
+            , Cmd.none
+            )
 
         UserRatingsFetched (Err msg) ->
             ( model, Cmd.none )
@@ -69,13 +80,22 @@ update msg model =
             ( model, Cmd.none )
 
         Next ->
-            (model, getNextOptimizationState)
+            ( model, getNextOptimizationState )
 
 
+withUsers : List String -> Model -> Model
+withUsers users model =
+    { model | users = users }
 
-withNewRatings : OptimizationState -> List (List Float) -> OptimizationState
-withNewRatings state ratings =
-    { state | ratings = ratings }
+
+withItems : List String -> Model -> Model
+withItems items model =
+    { model | items = items }
+
+
+withRatings : UserRatings.UserRatings -> Model -> Model
+withRatings userRatings model =
+    { model | userRatings = userRatings }
 
 
 fetchInitialState : Cmd Msg
@@ -85,9 +105,11 @@ fetchInitialState =
         , fetchCurrentOptimizationState
         ]
 
+
 fetchUserRatings : Cmd Msg
 fetchUserRatings =
     UserRatings.fetchUserRatings UserRatingsFetched
+
 
 fetchCurrentOptimizationState : Cmd Msg
 fetchCurrentOptimizationState =
@@ -103,32 +125,22 @@ getNextOptimizationState =
 
 decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
-    map3 OptimizationState (field "users" (list user)) (field "items" (list item)) (field "ratings" (list (list float)))
-
-
-user : Decoder User
-user =
-    map User (field "name" string)
-
-item : Decoder Item
-item =
-    map Item (field "name" string)
-
+    map OptimizationState (field "ratings" (list (list float)))
 
 view : Model -> Html Msg
 view model =
-        div []
-            [ UserRatings.renderUserRatings model.userRatings
-            , optimizationView model.optimizationState
-            ]
+    div []
+        [ UserRatings.renderUserRatings model.userRatings
+        , optimizationView model
+        ]
 
 
-optimizationView : OptimizationState -> Html Msg
-optimizationView optimizationState =
+optimizationView : Model -> Html Msg
+optimizationView model =
     div [ class "optimizationView" ]
         [ table []
-            (itemsHeading optimizationState.items
-                :: ratingsRows optimizationState.users optimizationState.ratings
+            (itemsHeading model.items
+                :: ratingsRows model.users model.optimizationState.ratings
             )
         , nextButton
         ]
@@ -140,26 +152,25 @@ nextButton =
         [ button [ onClick Next ] [ text "Next" ] ]
 
 
-itemsHeading : List Item -> Html Msg
+itemsHeading : List String -> Html Msg
 itemsHeading items =
     tr []
         (th [] []
-            :: List.map (\item -> th [] [ text item.name ]) items
+            :: List.map (\item -> th [] [ text item ]) items
         )
 
 
-ratingsRows : List User -> List (List Float) -> List (Html Msg)
+ratingsRows : List String -> List (List Float) -> List (Html Msg)
 ratingsRows users ratings =
     List.map2 ratingsRow users ratings
 
 
-ratingsRow : User -> List Float -> Html Msg
+ratingsRow : String -> List Float -> Html Msg
 ratingsRow user ratings =
     tr []
-        (td [] [ text user.name ]
+        (td [] [ text user ]
             :: List.map (\rating -> td [ class "rating" ] [ text (formatRating rating) ]) ratings
         )
-
 
 formatRating : Float -> String
 formatRating rating =
