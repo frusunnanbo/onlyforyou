@@ -137,8 +137,7 @@ floatMatrix = (list (list float))
 view : Model -> Html Msg
 view model =
     div []
-        [ UserRatings.renderUserRatings model.userRatings
-        , optimizationView model
+        [ optimizationView model
         ]
 
 
@@ -153,14 +152,18 @@ optimizationView model =
         itemFeatures = model.optimizationState.itemFeatures
         userFeatures = model.optimizationState.userFeatures
     in
-        div [ class "optimizationView" ]
-            [ table [ class "itemFeatures" ] (featureMatrix itemFeatures)
-            , table [ class "userFeatures" ] (featureMatrix userFeatures)
-            , table [ class "estimatedRatings" ]
-                (itemsHeading model.items
-                :: ratingsRows model.users estimatedRatings actualRatings
-                )
-            , nextButton
+        div [ class "container" ]
+            [ div [ class "row" ]
+                [ nextButton
+                , table [ class "itemFeatures" ] (featureMatrix itemFeatures)
+                ]
+            , div [ class "row" ]
+                [ table [ class "userFeatures" ] (featureMatrix userFeatures)
+                , table [ class "estimatedRatings" ]
+                    (itemsHeading model.items
+                    :: ratingsRows model.users estimatedRatings actualRatings
+                    )
+                ]
             ]
 
 
