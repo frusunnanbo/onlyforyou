@@ -149,15 +149,29 @@ optimizationView model =
                         |> UserRatings.toSparseMatrix
                         |> Array.map (\row -> Array.toList row)
                         |> Array.toList
+        estimatedRatings = model.optimizationState.ratings
+        itemFeatures = model.optimizationState.itemFeatures
+        userFeatures = model.optimizationState.userFeatures
     in
         div [ class "optimizationView" ]
-            [ table []
+            [ table [ class "itemFeatures" ] (featureMatrix itemFeatures)
+            , table [ class "userFeatures" ] (featureMatrix userFeatures)
+            , table [ class "estimatedRatings" ]
                 (itemsHeading model.items
-                :: ratingsRows model.users model.optimizationState.ratings actualRatings
+                :: ratingsRows model.users estimatedRatings actualRatings
                 )
             , nextButton
             ]
 
+
+featureMatrix : List (List Float) -> List (Html Msg)
+featureMatrix itemFeatures =
+    List.map featureRow itemFeatures
+
+featureRow : List Float -> Html Msg
+featureRow featureValues =
+    tr []
+        (List.map (\value -> td [] [ text (formatFloat value)]) featureValues)
 
 nextButton : Html Msg
 nextButton =
@@ -189,10 +203,10 @@ rating : Float -> Maybe Int -> Html Msg
 rating estimated actual =
     td
         [ class "rating", class (ratingAccuracy estimated actual) ]
-        [ text (formatRating estimated) ]
+        [ text (formatFloat estimated) ]
 
-formatRating : Float -> String
-formatRating rating =
+formatFloat : Float -> String
+formatFloat rating =
     FormatNumber.format usLocale rating
 
 ratingAccuracy : Float -> Maybe Int -> String

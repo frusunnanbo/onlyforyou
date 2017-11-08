@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Calculation {
 
-    private final static int NUMBER_OF_FEATURES = 10;
+    private final static int NUMBER_OF_FEATURES = 5;
     private final RatingsMatrix ratings;
     private final AtomicReference<OptimizationIteration> state;
 

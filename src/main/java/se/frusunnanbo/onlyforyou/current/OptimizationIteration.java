@@ -48,7 +48,7 @@ public class OptimizationIteration {
     }
 
     public double[][] userFeatures() {
-        return rawMatrix(userFeatures.transpose());
+        return rawMatrix(userFeatures);
     }
 
     private double[][] rawMatrix(SimpleMatrix matrix) {
