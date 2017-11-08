@@ -27,6 +27,22 @@ td.rating {
     text-align: center;
 }
 
+td.accurate {
+    background-color: #7CD12A;
+}
+
+td.rightish {
+    background-color: yellow;
+}
+
+td.wrongish {
+    background-color: orange;
+}
+
+td.wayoff {
+    background-color: red;
+}
+
 div.optimizationView {
     display: flex;
     align-items: flex-end;

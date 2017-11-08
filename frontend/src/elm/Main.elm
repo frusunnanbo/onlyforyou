@@ -5,6 +5,7 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Set exposing (Set)
+import Array exposing (Array)
 import Http
 import Json.Decode as Decode exposing (Decoder, decodeString, list, string, float, field, at, map, map2, map3)
 import FormatNumber
@@ -137,13 +138,19 @@ view model =
 
 optimizationView : Model -> Html Msg
 optimizationView model =
-    div [ class "optimizationView" ]
-        [ table []
-            (itemsHeading model.items
-                :: ratingsRows model.users model.optimizationState.ratings
-            )
-        , nextButton
-        ]
+    let
+        actualRatings = model.userRatings
+                        |> UserRatings.toSparseMatrix
+                        |> Array.map (\row -> Array.toList row)
+                        |> Array.toList
+    in
+        div [ class "optimizationView" ]
+            [ table []
+                (itemsHeading model.items
+                :: ratingsRows model.users model.optimizationState.ratings actualRatings
+                )
+            , nextButton
+            ]
 
 
 nextButton : Html Msg
@@ -160,22 +167,51 @@ itemsHeading items =
         )
 
 
-ratingsRows : List String -> List (List Float) -> List (Html Msg)
-ratingsRows users ratings =
-    List.map2 ratingsRow users ratings
+ratingsRows : List String -> List (List Float) -> List (List (Maybe Int)) -> List (Html Msg)
+ratingsRows users estimatedRatings actualRatings =
+    List.map3 ratingsRow users estimatedRatings actualRatings
 
 
-ratingsRow : String -> List Float -> Html Msg
-ratingsRow user ratings =
+ratingsRow : String -> List Float -> List (Maybe Int) -> Html Msg
+ratingsRow user estimatedRatings actualRatings =
     tr []
         (td [] [ text user ]
-            :: List.map (\rating -> td [ class "rating" ] [ text (formatRating rating) ]) ratings
+            :: List.map2 rating estimatedRatings actualRatings
         )
+
+rating : Float -> Maybe Int -> Html Msg
+rating estimated actual =
+    td
+        [ class "rating", class (ratingAccuracy estimated actual) ]
+        [ text (formatRating estimated) ]
 
 formatRating : Float -> String
 formatRating rating =
     FormatNumber.format usLocale rating
 
+ratingAccuracy : Float -> Maybe Int -> String
+ratingAccuracy estimated actual =
+
+        actual
+            |> Maybe.map (getError estimated)
+            |> Maybe.map ratingClass
+            |> Maybe.withDefault ""
+
+
+getError : Float -> Int -> Float
+getError estimated actual =
+     abs (estimated - (toFloat actual))
+
+ratingClass : Float -> String
+ratingClass error =
+    if (error < 0.01) then
+                "accurate"
+            else if (error < 0.05) then
+                "rightish"
+            else if (error < 1) then
+                "wrongish"
+            else
+                "wayoff"
 
 heading : List String -> Html Msg
 heading items =

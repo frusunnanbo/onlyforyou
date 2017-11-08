@@ -29,7 +29,7 @@ public class OptimizationIteration {
         final LeastSquareSolver leastSquareSolver
                 = new LeastSquareSolver(ratingsMatrix, new SimpleMatrix(ratings.known()), 0.001);
 
-        return new OptimizationIteration(userFeatures, itemFeatures, USER, leastSquareSolver);
+        return new OptimizationIteration(userFeatures, itemFeatures, ITEM, leastSquareSolver);
     }
 
     public OptimizationIteration next() {

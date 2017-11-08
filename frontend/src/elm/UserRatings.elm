@@ -1,4 +1,4 @@
-module UserRatings exposing (initialUserRatings, fetchUserRatings, renderUserRatings, UserRatings)
+module UserRatings exposing (initialUserRatings, fetchUserRatings, renderUserRatings, toSparseMatrix, UserRatings)
 
 import Html exposing (table, tr, th, td, div, button, text, Html)
 import Html.Attributes exposing (class)
@@ -22,7 +22,7 @@ type alias UserRatings =
 
 initialUserRatings : UserRatings
 initialUserRatings =
-    { users = [ "Britta" ], items = [ "Greta Gris" ], ratings = [] }
+    { users = [], items = [], ratings = [] }
 
 
 fetchUserRatings : (Result Http.Error UserRatings -> msg) -> Cmd msg
