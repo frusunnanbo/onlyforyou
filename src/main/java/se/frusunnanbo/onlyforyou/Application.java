@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import se.frusunnanbo.onlyforyou.current.Calculation;
 import se.frusunnanbo.onlyforyou.input.UserInput;
 import se.frusunnanbo.onlyforyou.model.Item;
-import se.frusunnanbo.onlyforyou.model.State;
 import se.frusunnanbo.onlyforyou.model.User;
 import se.frusunnanbo.onlyforyou.model.UserRatingInput;
 import spark.Spark;
@@ -28,10 +27,10 @@ public class Application {
         staticFiles.registerMimeType("html", "text/html; charset=utf-8");
 
         get("/userratings", (req, res) -> new UserRatingInput(users, items, userInput.userRatings()), gson::toJson);
-        get("/currentstate", (req, res) -> new State(current.loss(), current.estimations()), gson::toJson);
+        get("/currentstate", (req, res) -> current.state(), gson::toJson);
         post("/currentstate/next", (req, res) -> {
             current.next();
-            return new State(current.loss(), current.estimations());
+            return current.state();
         }, gson::toJson);
     }
 

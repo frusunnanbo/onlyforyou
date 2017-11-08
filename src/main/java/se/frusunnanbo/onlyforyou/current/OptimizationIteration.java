@@ -40,9 +40,21 @@ public class OptimizationIteration {
 
         final SimpleMatrix estimations = userFeatures.mult(itemFeatures.transpose());
 
-        final double[][] rawEstimations = new double[estimations.numRows()][];
-        for (int i = 0; i < estimations.numRows(); i++) {
-            final SimpleMatrix row = estimations.extractVector(true, i);
+        return rawMatrix(estimations);
+    }
+
+    public double[][] itemFeatures() {
+        return rawMatrix(itemFeatures.transpose());
+    }
+
+    public double[][] userFeatures() {
+        return rawMatrix(userFeatures.transpose());
+    }
+
+    private double[][] rawMatrix(SimpleMatrix matrix) {
+        final double[][] rawEstimations = new double[matrix.numRows()][];
+        for (int i = 0; i < matrix.numRows(); i++) {
+            final SimpleMatrix row = matrix.extractVector(true, i);
             rawEstimations[i] = row.getMatrix().getData();
         }
         return rawEstimations;
@@ -67,7 +79,7 @@ public class OptimizationIteration {
     }
 
     private static SimpleMatrix generateRandomFeatures(int numberOfFeatures, int numberOfRows) {
-        return SimpleMatrix.random(numberOfRows, numberOfFeatures, 0, 10, new Random());
+        return SimpleMatrix.random(numberOfRows, numberOfFeatures, 0, 5, new Random());
     }
 
 

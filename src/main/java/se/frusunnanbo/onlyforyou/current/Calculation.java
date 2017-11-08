@@ -1,5 +1,7 @@
 package se.frusunnanbo.onlyforyou.current;
 
+import se.frusunnanbo.onlyforyou.model.State;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Calculation {
@@ -18,12 +20,18 @@ public class Calculation {
         return new Calculation(ratings);
     }
 
-    public double[][] estimations() {
-        return state.get().estimations();
+    private double loss(OptimizationIteration iteration) {
+        // TODO fixme
+        return ratings.loss(iteration.estimations()) + LossFunctions.regularizationTerm();
     }
 
-    public double loss() {
-        return ratings.loss(state.get().estimations()) + LossFunctions.regularizationTerm();
+    public State state() {
+        final OptimizationIteration current = state.get();
+        return new State(
+                loss(current),
+                current.userFeatures(),
+                current.itemFeatures(),
+                current.estimations());
     }
 
     public Calculation next() {
