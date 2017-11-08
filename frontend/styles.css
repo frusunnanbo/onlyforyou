@@ -23,6 +23,18 @@ td:first-child, th:first-child {
     border-left: 0;
 }
 
+span.actual {
+    display: none;
+}
+
+td:hover span.actual {
+    display: inline-block;
+    font-size: 1.5rem;
+    position: relative;
+    left: 0.5rem;
+    z-index: 100;
+}
+
 td.rating {
     text-align: center;
 }

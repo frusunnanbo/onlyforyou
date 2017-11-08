@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Html exposing (table, tr, th, td, div, button, text, program, Html)
+import Html exposing (table, tr, th, td, div, span, button, text, program, Html)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
@@ -203,7 +203,16 @@ rating : Float -> Maybe Int -> Html Msg
 rating estimated actual =
     td
         [ class "rating", class (ratingAccuracy estimated actual) ]
-        [ text (formatFloat estimated) ]
+        [ text (formatFloat estimated)
+        , span [ class "actual" ] [ text (formatActual actual) ]
+        ]
+
+formatActual : Maybe Int -> String
+formatActual actual =
+    (actual
+        |> Maybe.map toString
+        |> Maybe.map (\value -> "(" ++ value ++ ")")
+        |> Maybe.withDefault "")
 
 formatFloat : Float -> String
 formatFloat rating =
