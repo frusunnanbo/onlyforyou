@@ -27,6 +27,8 @@ type alias User =
 
 type alias OptimizationState =
     { ratings : List (List Float)
+    , userFeatures: List (List Float)
+    , itemFeatures: List (List Float)
     }
 
 
@@ -40,7 +42,7 @@ type alias Model =
 
 initialOptimizationState : OptimizationState
 initialOptimizationState =
-    { ratings = [] }
+    { ratings = [], userFeatures = [], itemFeatures = [] }
 
 
 init : ( Model, Cmd Msg )
@@ -126,7 +128,11 @@ getNextOptimizationState =
 
 decodeCurrentState : Decoder OptimizationState
 decodeCurrentState =
-    map OptimizationState (field "ratings" (list (list float)))
+    map3 OptimizationState (field "ratings" floatMatrix) (field "userFeatures" floatMatrix) (field "itemFeatures" floatMatrix)
+
+floatMatrix : Decoder (List (List Float))
+floatMatrix = (list (list float))
+
 
 view : Model -> Html Msg
 view model =
