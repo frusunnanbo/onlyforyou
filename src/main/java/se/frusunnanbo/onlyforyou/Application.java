@@ -27,6 +27,8 @@ public class Application {
         staticFiles.registerMimeType("html", "text/html; charset=utf-8");
 
         get("/userratings", (req, res) -> new UserRatingInput(users, items, userInput.userRatings()), gson::toJson);
+        get("/userratings/extended", (req, res) ->
+                new UserRatingInput(users, items, userInput.join(UserInput.validationInput()).userRatings()), gson::toJson);
         get("/currentstate", (req, res) -> current.state(), gson::toJson);
         post("/currentstate/next", (req, res) -> {
             current.next();
