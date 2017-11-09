@@ -34,8 +34,27 @@ public class UserInput {
                 user("Dilba", rating("Skilda världar", 3)),
                 user("Eva", rating("Greta Gris", 5), rating("Sweeney Todd", 5), rating("Cityakuten", 5)),
                 user("Frida", rating("Scream", 2), rating("Väder", 1)),
-                user("Gun", rating("Mitt i naturen", 3), rating("Fotbolls-VM", 3), rating("Äntligen hemma", 5))
+                user("Gun", rating("Mitt i naturen", 3), rating("Fotbolls-VM", 3), rating("Äntligen hemma", 5)),
+                user("Hilda", rating("Mitt i naturen", 5), rating("Äntligen hemma", 4), rating("Scream", 4)),
+                user("Ida", rating("Gift vid första ögonkastet", 3), rating("Greta Gris", 1), rating("Cityakuten", 2)),
+                user("Johanna", rating("Cityakuten", 1), rating("Väder", 2), rating("Sweeney Todd", 1)),
+                user("Katrin", rating("Greta Gris", 4), rating("Sweeney Todd", 3), rating("Cityakuten", 3)),
+                user("Lisa", rating("Scream", 2), rating("Gift vid första ögonkastet", 2), rating("Väder", 5)),
+                user("Maria", rating("Skilda världar", 1), rating("Cityakuten", 4), rating("Scream", 2)),
+                user("Nina", rating("Väder", 4), rating("Cityakuten", 5), rating("Sweeney Todd", 2)),
+                user("Olga", rating("Gift vid första ögonkastet", 1), rating("Hela Sverige bakar", 3), rating("Mitt i naturen", 2))
         ));
+    }
+
+    public static UserInput validationInput() {
+        return new UserInput(Arrays.asList(
+                user("Anna", rating("Hela Sverige bakar", 3)),
+                user("Britta", rating("Gift vid första ögonkastet", 2)),
+                user("Carin", rating("Mitt i naturen", 4)),
+                user("Dilba", rating("Skilda världar", 3)),
+                user("Eva", rating("Greta Gris", 5)),
+                user("Frida", rating("Scream", 2)),
+                user("Gun", rating("Mitt i naturen", 3))));
     }
 
     public static UserInput of(List<UserRatings> input) {
