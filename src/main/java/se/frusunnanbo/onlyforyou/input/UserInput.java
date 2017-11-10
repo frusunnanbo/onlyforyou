@@ -58,8 +58,13 @@ public class UserInput {
                 user("Katrin", rating("Greta Gris", 4), rating("Sweeney Todd", 3), rating("Cityakuten", 3)),
                 user("Lisa", rating("Scream", 2), rating("Gift vid första ögonkastet", 2), rating("Väder", 5)),
                 user("Maria", rating("Skilda världar", 1), rating("Cityakuten", 4), rating("Scream", 2)),
-                user("Nina", rating("Väder", 4), rating("Cityakuten", 5), rating("Sweeney Todd", 2)),
-                user("Olga", rating("Gift vid första ögonkastet", 1), rating("Hela Sverige bakar", 3), rating("Mitt i naturen", 2))
+                user("Nina", rating("Väder", 4), rating("Hela Sverige bakar", 5), rating("Sweeney Todd", 2)),
+                user("Olga", rating("Gift vid första ögonkastet", 1), rating("Hela Sverige bakar", 3), rating("Mitt i naturen", 2)),
+                user("Pernilla", rating("Greta Gris", 4), rating("Äntligen hemma", 3), rating("Fotbolls-VM", 3)),
+                user("Quinoa", rating("Skilda världar", 2), rating("Gift vid första ögonkastet", 2), rating("Väder", 5)),
+                user("Rita", rating("Skilda världar", 1), rating("Fotbolls-VM", 4), rating("Väder", 2)),
+                user("Sandra", rating("Väder", 4), rating("Fotbolls-VM", 5), rating("Äntligen hemma", 2)),
+                user("Tina", rating("Gift vid första ögonkastet", 1), rating("Hela Sverige bakar", 3), rating("Mitt i naturen", 2))
         ));
     }
 
