@@ -186,7 +186,7 @@ itemsHeading : List String -> Html Msg
 itemsHeading items =
     tr []
         (th [] []
-            :: List.map (\item -> th [] [ text item ]) items
+            :: List.map (\item -> th [] [ span [ class "vertical" ] [ text item ]]) items
         )
 
 
