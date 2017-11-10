@@ -79,7 +79,7 @@ div.nextbutton {
     flex-basis: 10vw;
 }
 
-div.nextbutton button {
+button {
     font-size: 2rem;
     padding: 0.4rem 0.8rem;
     background-color: #7CD12A;
@@ -87,4 +87,9 @@ div.nextbutton button {
     border: none;
     border-radius: 0.2rem;
     margin-bottom: 2vw;
+    margin-right: 2vw;
+}
+
+div.validationButton button {
+    background-color: red;
 }

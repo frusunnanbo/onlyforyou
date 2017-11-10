@@ -161,8 +161,7 @@ optimizationView model =
     in
         div [ class "container" ]
             [ div [ class "row" ]
-                [ validationButton
-                , nextButton
+                [ nextButton
                 , table [ class "itemFeatures" ] (featureMatrix itemFeatures)
                 ]
             , div [ class "row" ]
@@ -172,6 +171,8 @@ optimizationView model =
                     :: ratingsRows model.users estimatedRatings actualRatings
                     )
                 ]
+            , div [ class "row" ]
+                [ validationButton ]
             ]
 
 
@@ -186,7 +187,7 @@ featureRow featureValues =
 
 validationButton : Html Msg
 validationButton =
-    div [ class "validationBbutton" ]
+    div [ class "validationButton" ]
         [ button [ onClick Validate ] [ text "Validate" ] ]
 
 nextButton : Html Msg
