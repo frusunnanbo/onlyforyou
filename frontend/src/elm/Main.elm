@@ -60,6 +60,7 @@ type Msg
     = UserRatingsFetched (Result Http.Error UserRatings.UserRatings)
     | CurrentState (Result Http.Error OptimizationState)
     | Next
+    | Validate
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,7 +84,10 @@ update msg model =
             ( model, Cmd.none )
 
         Next ->
-            ( model, getNextOptimizationState )
+            ( model, getNextOptimizationState)
+
+        Validate ->
+            ( model, fetchValidationDataset )
 
 
 withUsers : List String -> Model -> Model
@@ -113,6 +117,9 @@ fetchUserRatings : Cmd Msg
 fetchUserRatings =
     UserRatings.fetchUserRatings UserRatingsFetched
 
+fetchValidationDataset : Cmd Msg
+fetchValidationDataset =
+    UserRatings.fetchValidationRatings UserRatingsFetched
 
 fetchCurrentOptimizationState : Cmd Msg
 fetchCurrentOptimizationState =
@@ -154,7 +161,8 @@ optimizationView model =
     in
         div [ class "container" ]
             [ div [ class "row" ]
-                [ nextButton
+                [ validationButton
+                , nextButton
                 , table [ class "itemFeatures" ] (featureMatrix itemFeatures)
                 ]
             , div [ class "row" ]
@@ -175,6 +183,11 @@ featureRow : List Float -> Html Msg
 featureRow featureValues =
     tr []
         (List.map (\value -> td [] [ text (formatFloat value)]) featureValues)
+
+validationButton : Html Msg
+validationButton =
+    div [ class "validationBbutton" ]
+        [ button [ onClick Validate ] [ text "Validate" ] ]
 
 nextButton : Html Msg
 nextButton =

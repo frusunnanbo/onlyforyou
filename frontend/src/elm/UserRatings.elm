@@ -1,4 +1,4 @@
-module UserRatings exposing (initialUserRatings, fetchUserRatings, renderUserRatings, toSparseMatrix, UserRatings)
+module UserRatings exposing (initialUserRatings, fetchUserRatings, fetchValidationRatings, toSparseMatrix, UserRatings)
 
 import Html exposing (table, tr, th, td, div, button, text, Html)
 import Html.Attributes exposing (class)
@@ -28,6 +28,11 @@ initialUserRatings =
 fetchUserRatings : (Result Http.Error UserRatings -> msg) -> Cmd msg
 fetchUserRatings msg =
     Http.get "/userratings" decodeUserRatings
+        |> Http.send msg
+
+fetchValidationRatings : (Result Http.Error UserRatings -> msg) -> Cmd msg
+fetchValidationRatings msg =
+    Http.get "/userratings/extended" decodeUserRatings
         |> Http.send msg
 
 decodeUserRatings : Decoder UserRatings
