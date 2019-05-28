@@ -61,8 +61,8 @@ public class UserInputTest {
                                 rating("Smultronstället", 5))));
         assertThat(ratings).has(dimensions(2, 1));
         assertThat(ratings.knownElements()).containsExactlyInAnyOrder(
-                userRating(0, 0, 6),
-                userRating(1, 0, 5));
+                userRating(1, 0, 6),
+                userRating(0, 0, 5));
     }
 
     @Test
