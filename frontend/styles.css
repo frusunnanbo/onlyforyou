@@ -4,7 +4,7 @@ body {
 }
 
 .vertical {
-    writing-mode: vertical-lr;
+    writing-mode: vertical-rl;
 }
 
 .container {
